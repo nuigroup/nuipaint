@@ -1,14 +1,14 @@
 from pymt import *
 from pyglet.gl import *
 
-class toolbar(MTGridLayout):
+class toolbarHolder(MTGridLayout):
     def __init__(self, **kwargs):
         kwargs.setdefault('width', 500)
         kwargs.setdefault('height', 70)
         kwargs.setdefault('rows', 1)
         kwargs.setdefault('cols', 10)
         kwargs.setdefault('spacing', 10)
-        super(toolbar, self).__init__(**kwargs)
+        super(toolbarHolder, self).__init__(**kwargs)
         self.bgcolor = (0.3,0.3,0.3,1)
         self.border_radius = 8
         self.size = (self.width,self.height)
@@ -23,5 +23,29 @@ class toolbar(MTGridLayout):
             drawRoundedRectangle(size=self.size, radius=self.border_radius)
             drawRoundedRectangle(size=self.size, radius=self.border_radius, style=GL_LINE_LOOP)
             drawRoundedRectangleAlpha(size=self.size, radius=self.border_radius, alpha=(1,1,.5,.5))
-
+            
+ 
+class toolbar(MTWidget):
+    def __init__(self, **kwargs):
+        super(toolbar, self).__init__(**kwargs)
+        tb = toolbarHolder()
+        icon1 = MTImageButton(filename='gfx/icons/undo.png')
+        icon2 = MTImageButton(filename='gfx/icons/undo.png')
+        icon3 = MTImageButton(filename='gfx/icons/undo.png')
+        icon4 = MTImageButton(filename='gfx/icons/undo.png')
+        icon5 = MTImageButton(filename='gfx/icons/undo.png')
+        icon6 = MTImageButton(filename='gfx/icons/undo.png')
+        icon7 = MTImageButton(filename='gfx/icons/undo.png')
+        icon8 = MTImageButton(filename='gfx/icons/undo.png')
+        icon9 = MTImageButton(filename='gfx/icons/undo.png')
+        tb.add_widget(icon1)
+        tb.add_widget(icon2)
+        tb.add_widget(icon3)
+        tb.add_widget(icon4)
+        tb.add_widget(icon5)
+        tb.add_widget(icon6)
+        tb.add_widget(icon7)
+        tb.add_widget(icon8)
+        tb.add_widget(icon9)
+        self.add_widget(tb)
             

@@ -12,11 +12,10 @@ class toolbarHolder(MTGridLayout):
         self.bgcolor = (0.3,0.3,0.3,1)
         self.border_radius = 8
         self.size = (self.width,self.height)
-        self.pos=(int(1440/2-self.width/2),-5) #make this indepeneted of the window size
+        self.parent_win = kwargs.get('parent_win')
+        self.pos=(int(self.parent_win.width/2-self.width/2),-5) #make this indepeneted of the window size
         
     def draw(self):
-        #x, y, w, h = self.x, self.y, self.width, self.height
-        #print "x:",self.x
         set_color(*self.bgcolor)
         with gx_matrix:
             glTranslatef(self.pos[0], self.pos[1], 0)
@@ -28,7 +27,7 @@ class toolbarHolder(MTGridLayout):
 class toolbar(MTWidget):
     def __init__(self, **kwargs):
         super(toolbar, self).__init__(**kwargs)
-        tb = toolbarHolder()
+        tb = toolbarHolder(parent_win=kwargs.get('win'))
         icon1 = MTImageButton(filename='gfx/icons/color white txt.png')
         icon2 = MTImageButton(filename='gfx/icons/brush white txt.png')
         icon3 = MTImageButton(filename='gfx/icons/select white txt.png')

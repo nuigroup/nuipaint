@@ -4,6 +4,6 @@ from core.toolbar import *
 
 if __name__ == '__main__':
     w = MTWindow()
-    tb = toolbar()
+    tb = toolbar(win=w)
     w.add_widget(tb)    
     runTouchApp()

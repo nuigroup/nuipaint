@@ -157,7 +157,7 @@ if __name__ == '__main__':
     cplayout.add_widget(s4)
 
     #setup filter icon and the menu system
-    filterBut = MTImageButton(filename="gfx/icons/filters.jpg")
+    filterBut = MTImageButton(filename="gfx/icons/filter white txt.png")
     filterBut.x,filterBut.y = int(w.width/2-filterBut.width/2),0
     w.add_widget(filterBut)
 

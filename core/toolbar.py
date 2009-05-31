@@ -1,3 +1,4 @@
+from __future__ import with_statement
 from pymt import *
 from pyglet.gl import *
 
@@ -27,20 +28,30 @@ class toolbarHolder(MTGridLayout):
 class toolbar(MTWidget):
     def __init__(self, **kwargs):
         super(toolbar, self).__init__(**kwargs)
+        self.canvas = kwargs.get('canvas')
         tb = toolbarHolder(parent_win=kwargs.get('win'))
-        icon1 = MTImageButton(filename='gfx/icons/color white txt.png')
-        icon2 = MTImageButton(filename='gfx/icons/brush white txt.png')
-        icon3 = MTImageButton(filename='gfx/icons/select white txt.png')
-        icon4 = MTImageButton(filename='gfx/icons/zoom white txt.png')
-        icon5 = MTImageButton(filename='gfx/icons/filter white txt.png')
-        icon6 = MTImageButton(filename='gfx/icons/polygon white txt.png')
-        icon7 = MTImageButton(filename='gfx/icons/flickr white txt.png')
-        tb.add_widget(icon1)
-        tb.add_widget(icon2)
-        tb.add_widget(icon3)
-        tb.add_widget(icon4)
-        tb.add_widget(icon5)
-        tb.add_widget(icon6)
-        tb.add_widget(icon7)
+        color_icon = MTImageButton(filename='gfx/icons/color white txt.png')
+        brush_icon = MTImageButton(filename='gfx/icons/brush white txt.png')
+        select_icon = MTImageButton(filename='gfx/icons/select white txt.png')
+        zoom_icon = MTImageButton(filename='gfx/icons/zoom white txt.png')
+        filter_icon = MTImageButton(filename='gfx/icons/filter white txt.png')
+        polygon_icon = MTImageButton(filename='gfx/icons/polygon white txt.png')
+        flickr_icon = MTImageButton(filename='gfx/icons/flickr white txt.png')
+        tb.add_widget(color_icon)
+        tb.add_widget(brush_icon)
+        tb.add_widget(select_icon)
+        tb.add_widget(zoom_icon)
+        tb.add_widget(filter_icon)
+        tb.add_widget(polygon_icon)
+        tb.add_widget(flickr_icon)
         self.add_widget(tb)
+        
+        @zoom_icon.event
+        def on_press(touchID, x, y):
+            self.canvas.set_mode("zoom")
+            
+        @brush_icon.event
+        def on_press(touchID, x, y):
+            self.canvas.set_mode("draw")
+        
             

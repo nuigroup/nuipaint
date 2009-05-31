@@ -13,6 +13,7 @@ class Canvas(MTScatterWidget):
         self.layer_clear()
         self.touch_positions = {}
         self.mode = "zoom"
+        set_brush_size(25)
         
     def layer_clear(self):
         self.fbo.bind()

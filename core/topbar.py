@@ -8,6 +8,7 @@ class topBar(MTWidget):
     def __init__(self, **kwargs):
         super(topBar, self).__init__(**kwargs)
         self.parent_win = kwargs.get('win')
+        self.filebrowser = kwargs.get('filebrowser')
         tb = toolbarHolder(size=(100,70),spacing=10)
         tb.pos = (0, self.parent_win.height-tb.height+5)
         save_icon = MTIconButton(icon_file='gfx/icons/filesave.png',label="Save")
@@ -22,3 +23,8 @@ class topBar(MTWidget):
         tb.add_widget(fullscreen_icon)
         self.add_widget(tb)
         tb.size = (tb._get_content_width()-45,tb.height)
+        
+        @open_icon.event
+        def on_press(touchID, x, y):
+            self.filebrowser.show()
+        

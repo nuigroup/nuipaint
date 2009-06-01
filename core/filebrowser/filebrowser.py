@@ -72,24 +72,23 @@ class MTFileEntry(MTIconObject, MTKineticObject):
         if self.db.visible and self.db.on_touch_down(touches, touchID, x, y):
             return True
             
-class MTFileBrowser(MTScatterPlane):
+class MTFileBrowser(MTWidget):
     def __init__(self, **kwargs):
         kwargs.setdefault('do_scale', False)
         kwargs.setdefault('do_rotation', False)
-        kwargs.setdefault('do_translation', False)
+        kwargs.setdefault('do_translation', True)
         super(MTFileBrowser, self).__init__(**kwargs)
+        self.pos = kwargs.get('pos')
         self.kb = KineticBrowseLayout(pos=self.pos, size=self.size, w_limit=4, deletable=False, searchable=False)
         self.add_widget(self.kb)
         self.dl = GlDisplayList()
         self.path = '.'
         self.close_button = MTImageButton(filename="core/filebrowser/close.png")
+        self.add_widget(self.close_button)
         @self.close_button.event
         def on_press(touchID, x, y):
             self.hide()
-        self.add_widget(self.close_button)
-        
-        self.pos = (0,0)
-   
+  
     def update_listing(self):
         self.path = os.path.abspath(self.path)
         for name in os.listdir(self.path):

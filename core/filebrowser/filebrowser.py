@@ -9,7 +9,7 @@ class KineticBrowseLayout(MTKineticList):
         super(KineticBrowseLayout, self).__init__(**kwargs)
         
     def draw(self):
-        set_color(*self.bgcolor)
+        set_color(*self.style['bg-color'])
         drawRectangle(self.pos, self.size)  #background
         super(MTKineticList, self).on_draw()
         #drawRectangle((self.x, self.height + self.y - 40), (self.width, 40))  #Title Bar
@@ -74,6 +74,9 @@ class MTFileEntry(MTIconObject, MTKineticObject):
             
 class MTFileBrowser(MTScatterPlane):
     def __init__(self, **kwargs):
+        kwargs.setdefault('do_scale', False)
+        kwargs.setdefault('do_rotation', False)
+        kwargs.setdefault('do_translation', False)
         super(MTFileBrowser, self).__init__(**kwargs)
         self.kb = KineticBrowseLayout(pos=self.pos, size=self.size, w_limit=4, deletable=False, searchable=False)
         self.add_widget(self.kb)
@@ -84,7 +87,9 @@ class MTFileBrowser(MTScatterPlane):
         def on_press(touchID, x, y):
             self.hide()
         self.add_widget(self.close_button)
-    
+        
+        self.pos = (0,0)
+   
     def update_listing(self):
         self.path = os.path.abspath(self.path)
         for name in os.listdir(self.path):

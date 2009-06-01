@@ -36,9 +36,7 @@ class Canvas(MTScatterWidget):
             
     def on_touch_move(self, touches, touchID, x, y):
         if self.touch_positions.has_key(touchID):
-            print "inside touch move"
             if self.mode == "zoom":
-                print "inside zoom"
                 super(Canvas, self).on_touch_move(touches, touchID, x, y)
             elif self.mode == "draw":
                 cur_pos = self.to_local(x,y)

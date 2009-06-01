@@ -72,7 +72,7 @@ class MTFileEntry(MTIconObject, MTKineticObject):
         if self.db.visible and self.db.on_touch_down(touches, touchID, x, y):
             return True
             
-class MTFileBrowser(MTWidget):
+class MTFileBrowser(MTScatterPlane):
     def __init__(self, **kwargs):
         super(MTFileBrowser, self).__init__(**kwargs)
         self.kb = KineticBrowseLayout(pos=self.pos, size=self.size, w_limit=4, deletable=False, searchable=False)

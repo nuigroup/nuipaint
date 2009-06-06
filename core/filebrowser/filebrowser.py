@@ -72,19 +72,19 @@ class MTFileEntry(MTIconObject, MTKineticObject):
         if self.db.visible and self.db.on_touch_down(touches, touchID, x, y):
             return True
             
-class MTFileBrowser(MTWidget):
+class MTFileBrowser(MTScatterWidget):
     def __init__(self, **kwargs):
-        kwargs.setdefault('do_scale', False)
-        kwargs.setdefault('do_rotation', False)
-        kwargs.setdefault('do_translation', True)
+        #kwargs.setdefault('do_scale', False)
+        #kwargs.setdefault('do_rotation', False)
+        #kwargs.setdefault('do_translation', True)
         super(MTFileBrowser, self).__init__(**kwargs)
-        self.pos = kwargs.get('pos')
-        self.kb = KineticBrowseLayout(pos=self.pos, size=self.size, w_limit=4, deletable=False, searchable=False)
-        self.add_widget(self.kb)
+        self.kb = KineticBrowseLayout(w_limit=4, deletable=False, searchable=False,size=(self.width-20,self.height-20))
+        self.add_widget(self.kb,"front")
         self.dl = GlDisplayList()
         self.path = '.'
         self.close_button = MTImageButton(filename="core/filebrowser/close.png")
-        self.add_widget(self.close_button)
+        self.close_button.pos = (self.width-self.close_button.width,self.height-self.close_button.height)
+        self.add_widget(self.close_button,"front")
         @self.close_button.event
         def on_press(touchID, x, y):
             self.hide()
@@ -100,22 +100,16 @@ class MTFileBrowser(MTWidget):
         self.path = path
         self.remove_widget(self.kb)
         self.kb = None
-        self.kb = KineticBrowseLayout(pos=self.pos, size=self.size, w_limit=4, deletable=False, searchable=False)
+        self.kb = KineticBrowseLayout(w_limit=4, deletable=False, searchable=False,size=(self.width-20,self.height-20))
         self.add_widget(self.kb)
         self.dl.clear()
-
     
-    def draw(self):
+    def on_draw(self):
         if not self.dl.is_compiled():
-            self.update_listing()
-            with DO(self.dl, gx_blending):
-                self.close_button.pos = (self.x+self.width-5,self.y+self.height-2)
-                set_color(0.8, 0.8, 0.8, 1)
-                drawRoundedRectangle(pos=(self.x-10,self.y-10),size=(self.width+20,self.height+20), radius=10)                
-                set_color(1, 1, 1, 1)
-                drawRectangle(self.pos,self.size)
-                for w in self.children:
-                    w.dispatch_event('on_draw')
+            with DO(self.dl):
+                self.update_listing()
+                #drawRoundedRectangle(size=(self.width,self.height), radius=10) 
         self.dl.draw()
+        super(MTFileBrowser, self).on_draw()
 
 

@@ -7,10 +7,11 @@ if __name__ == '__main__':
     w = MTWindow()
     cv = Canvas(pos=(w.width/2,w.height/2))
     w.add_widget(cv)    
-    fb = MTFileBrowser(pos=(100,w.height-400),size=(350,250))
+    fb = MTFileBrowser(pos=(0,0),size=(400,300))
     w.add_widget(fb)
     tb = toolbar(win=w,canvas=cv)
     w.add_widget(tb)
     topb = topBar(win=w,canvas=cv,filebrowser=fb)
     w.add_widget(topb)
     runTouchApp()
+    

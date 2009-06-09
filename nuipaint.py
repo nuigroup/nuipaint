@@ -19,7 +19,7 @@ if __name__ == '__main__':
     w.add_widget(topb)
     #Side Ciruclar Menu
     #kt = MTKinetic(velstop=5.0)
-    cm = MTCircularMenu(pos=(300,300),radius=300)
+    cm = MTCircularMenu(pos=(300,300),radius=150)
     w.add_widget(cm)
     #w.add_widget(kt)
     runTouchApp()

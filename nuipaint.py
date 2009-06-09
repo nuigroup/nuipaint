@@ -1,7 +1,9 @@
 from __future__ import with_statement
+from math import cos,sin,pi
 from pymt import *
 
 from core import *
+
 
 if __name__ == '__main__':
     w = MTWindow()
@@ -18,9 +20,16 @@ if __name__ == '__main__':
     topb = topBar(win=w,canvas=cv,filebrowser=fb)
     w.add_widget(topb)
     #Side Ciruclar Menu
-    #kt = MTKinetic(velstop=5.0)
-    cm = MTCircularMenu(pos=(300,300),radius=150)
-    w.add_widget(cm)
-    #w.add_widget(kt)
+    kt = MTKinetic(velstop=5.0)
+    cm = MTCircularMenu(pos=(0,0),radius=300)
+    kt.add_widget(cm)
+    for i in range (24):
+        teta = float((360/24)*i*(pi/180))
+        x =  int(248*cos(teta))
+        y =  int(248*sin(teta))
+        im = MTImageButton(filename="gfx/icons/flickr.png",pos=(x,y))
+        cm.add_widget(im)
+        
+    w.add_widget(kt)
     runTouchApp()
   

@@ -80,6 +80,7 @@ class MTFileBrowser(MTScatterWidget):
         super(MTFileBrowser, self).__init__(**kwargs)
         self.kb = KineticBrowseLayout(w_limit=4, deletable=False, searchable=False,size=(self.width-20,self.height-20))
         self.add_widget(self.kb,"front")
+        self.kb.pos=(10,10)
         self.dl = GlDisplayList()
         self.path = '.'
         self.close_button = MTImageButton(filename="core/filebrowser/close.png")
@@ -102,6 +103,7 @@ class MTFileBrowser(MTScatterWidget):
         self.kb = None
         self.kb = KineticBrowseLayout(w_limit=4, deletable=False, searchable=False,size=(self.width-20,self.height-20))
         self.add_widget(self.kb)
+        self.kb.pos=(10,10)
         self.dl.clear()
     
     def on_draw(self):

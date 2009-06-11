@@ -47,7 +47,7 @@ class MTCircularMenu(MTWidget):
             drawTriangle(pos=(0, 0), w=40, h=100)
             for w in self.children:
                 with gx_matrix:
-                    angle = Vector(w.pos).angle((self.radius, 0))
+                    angle = Vector(w.pos).angle((0,self.radius))
                     glTranslatef(w.x, w.y, 0)
                     glRotatef(angle, 0, 0, 1)
                     glTranslatef(-w.x, -w.y, 0)

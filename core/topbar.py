@@ -26,5 +26,4 @@ class topBar(MTWidget):
         
         @open_icon.event
         def on_press(touchID, x, y):
-            self.filebrowser.show()
-        
+            self.filebrowser.show()        

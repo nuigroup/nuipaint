@@ -52,7 +52,6 @@ class MTCircularMenu(MTWidget):
                     glRotatef(angle, 0, 0, 1)
                     glTranslatef(-w.x, -w.y, 0)
                     w.dispatch_event('on_draw')
-            #super(MTCircularMenu, self).on_draw()
 
 if __name__ == '__main__':
     w = MTWindow()

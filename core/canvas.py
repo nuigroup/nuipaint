@@ -21,7 +21,6 @@ class Canvas(MTScatterWidget):
         glClear(GL_COLOR_BUFFER_BIT)
         self.fbo.release()
 
-
     def on_touch_down(self, touches, touchID, x, y):
         if self.collide_point(x,y):
             self.touch_positions[touchID] = self.to_local(x,y)
@@ -47,7 +46,6 @@ class Canvas(MTScatterWidget):
                 self.fbo.release()
                 self.touch_positions[touchID] = self.to_local(x,y)
             return True
-
 
     def draw(self):
         with gx_matrix:

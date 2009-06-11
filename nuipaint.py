@@ -22,13 +22,16 @@ if __name__ == '__main__':
     #Side Ciruclar Menu
     kt = MTKinetic(velstop=5.0)
     cm = MTCircularMenu(pos=(0,0),radius=200)
+    cm2 = MTCircularMenu(pos=(w.width,0),radius=200)
     kt.add_widget(cm)
+    kt.add_widget(cm2)
     for i in range (18):
         teta = float((360/18)*i*(pi/180))
         x =  int(143*cos(teta))
         y =  int(143*sin(teta))
         im = MTImageButton(filename="gfx/icons/flickr.png",pos=(x,y))
         cm.add_widget(im)
+        cm2.add_widget(im)
         
     w.add_widget(kt)
     runTouchApp()

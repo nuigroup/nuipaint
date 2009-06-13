@@ -58,5 +58,10 @@ class toolbar(MTWidget):
         @brush_icon.event
         def on_press(touchID, x, y):
             self.canvas.set_mode("draw")
+            
+        @filter_icon.event
+        def on_press(touchID, x, y):
+            self.canvas.set_mode("smudge")   
+         
         
             

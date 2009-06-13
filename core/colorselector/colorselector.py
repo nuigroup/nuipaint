@@ -1,7 +1,7 @@
 from __future__ import with_statement
 from pymt import *
 from pyglet.gl import *
-from math import sin,cos,radians
+from math import sin,cos,radians,sqrt
 
        
 def drawPartialCircle(pos=(0,0), radius=100):
@@ -9,7 +9,7 @@ def drawPartialCircle(pos=(0,0), radius=100):
         glColor3f(0,0,1)
         glVertex2f(0,0)        
         for angle in range (90,195,5):        
-            glColor3f(sin(radians(angle-90)),cos(radians(angle-90)),0)
+            glColor3f(sin(radians(angle-90))*sqrt(2),cos(radians(angle-90))*sqrt(2),0)
             glVertex2f(int(cos(radians(angle))*radius),int(sin(radians(angle))*radius))  
             
         
@@ -52,8 +52,8 @@ class MTColorSelector(MTWidget):
             
     def calculate_color(self):
         b = 1-self.point_distance/self.size[0]
-        r = sin(radians(self.point_angle))-b
-        g = cos(radians(self.point_angle))-b
+        r = (sin(radians(self.point_angle))-b)*sqrt(2)
+        g = (cos(radians(self.point_angle))-b)*sqrt(2)
         
         self.back_color = (r,g,b)
         if(self.canvas):

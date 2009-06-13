@@ -31,7 +31,7 @@ if __name__ == '__main__':
         cm.add_widget(im)
     w.add_widget(kt)
       
-    cs = MTColorSelector(pos=(w.width,0))
+    cs = MTColorSelector(pos=(w.width-200,0),size=(200,200),win=w,canvas=cv)
     w.add_widget(cs)
     runTouchApp()
   

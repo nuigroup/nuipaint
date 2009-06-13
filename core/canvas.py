@@ -14,6 +14,7 @@ class Canvas(MTScatterWidget):
         self.touch_positions = {}
         self.mode = "zoom"
         set_brush_size(25)
+        self.brush_color=(0,0,0,1)
         
     def layer_clear(self):
         self.fbo.bind()
@@ -26,7 +27,7 @@ class Canvas(MTScatterWidget):
             self.touch_positions[touchID] = self.to_local(x,y)
             if self.mode == "draw":
                 self.fbo.bind()
-                glColor4f(0,1,0,1)
+                set_color(*self.brush_color)
                 drawCircle(pos=self.to_local(x,y), radius=1)            
                 self.fbo.release()
             elif self.mode == "zoom":
@@ -41,7 +42,7 @@ class Canvas(MTScatterWidget):
                 cur_pos = self.to_local(x,y)
                 ox,oy = self.touch_positions[touchID]
                 self.fbo.bind()
-                glColor4f(0,1,0,1)
+                set_color(*self.brush_color)
                 paintLine((ox,oy,cur_pos[0],cur_pos[1]))
                 self.fbo.release()
                 self.touch_positions[touchID] = self.to_local(x,y)
@@ -57,3 +58,6 @@ class Canvas(MTScatterWidget):
 
     def set_mode(self,mode):
         self.mode = mode
+        
+    def set_brush_color(self,color):
+        self.brush_color = color

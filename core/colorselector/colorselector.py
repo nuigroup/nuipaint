@@ -51,11 +51,13 @@ class MTColorSelector(MTWidget):
             self.calculate_color()
             
     def calculate_color(self):
-        #print self.point_angle
-        #print "r,g,b:",sin(radians(self.point_angle)),cos(radians(self.point_angle)),1-self.point_distance/self.size[0]
-        self.back_color = (sin(radians(self.point_angle)),cos(radians(self.point_angle)),1-self.point_distance/self.size[0])
+        b = 1-self.point_distance/self.size[0]
+        r = sin(radians(self.point_angle))-b
+        g = cos(radians(self.point_angle))-b
+        
+        self.back_color = (r,g,b)
         if(self.canvas):
-            self.canvas.set_brush_color((sin(radians(self.point_angle)),cos(radians(self.point_angle)),1-self.point_distance/self.size[0]))
+            self.canvas.set_brush_color((r,g,b))
         
 
 if __name__ == '__main__':

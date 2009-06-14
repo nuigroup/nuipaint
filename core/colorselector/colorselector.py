@@ -8,11 +8,13 @@ def drawPartialCircle(pos=(0,0), radius=100):
     with gx_begin(GL_TRIANGLE_FAN):
         glColor3f(0,0,1)
         glVertex2f(0,0)        
-        for angle in range (90,195,5):        
+        for angle in range (90,185,5):        
             glColor3f(sin(radians(angle-90))*sqrt(2),cos(radians(angle-90))*sqrt(2),0)
-            glVertex2f(int(cos(radians(angle))*radius),int(sin(radians(angle))*radius))  
-            
-        
+            glVertex2f(int(cos(radians(angle))*radius),int(sin(radians(angle))*radius))
+
+def drawSemiCircle(pos=(0,0), inner_radius=100,outer_radius=100,slices=32,loops=1,start_angle=0,sweep_angle=0):
+    gluPartialDisk(gluNewQuadric(), inner_radius, outer_radius, slices, loops, start_angle,sweep_angle )
+         
 
 class MTColorSelector(MTWidget):
     def __init__(self, **kwargs):
@@ -30,11 +32,14 @@ class MTColorSelector(MTWidget):
 
     def draw(self):
         set_color(*self.back_color)
-        drawCSSRectangle(pos=self.pos, size=self.size, style=self.style)
+        #drawCSSRectangle(pos=self.pos, size=self.size, style=self.style)
         with gx_matrix_identity:
             glTranslated(self.pos[0]+self.size[0], self.pos[1], 0)
             set_color(*self.style.get('bg-color'))
-            drawPartialCircle(pos=self.pos,radius=200)
+            drawSemiCircle(pos=self.pos, inner_radius=180,outer_radius=225,slices=32,loops=1,start_angle=-90,sweep_angle=90)
+            set_color(*self.back_color)
+            drawSemiCircle(pos=self.pos, inner_radius=205,outer_radius=220,slices=32,loops=1,start_angle=-23, sweep_angle=20)
+            drawPartialCircle(pos=self.pos,radius=200) #Draw Color Wheel
 
     
     def on_touch_down(self, touches, touchID, x, y):

@@ -9,15 +9,22 @@ def drawSemiCircle(pos=(0,0), inner_radius=100,outer_radius=100,slices=32,loops=
 class MTCircularScroller(MTWidget): 
     def __init__(self, **kwargs):
         kwargs.setdefault('radius', 200)
+        kwargs.setdefault('thickness', 40)
+        kwargs.setdefault('padding', 3)
+        kwargs.setdefault('sweep_angle', 90)
         super(MTCircularScroller, self).__init__(**kwargs)
         self.radius = kwargs.get('radius')        
         self.last_touch = (0, 0)
         self.angle = 0.0
-        self.rotation = -40.0
+        self.rotation = 0.0
         self.radius_line = (int(self.radius*sin(radians(self.rotation))),int(self.radius*cos(radians(self.rotation))))
+        self.thickness = kwargs.get('thickness')
+        self.padding = kwargs.get('padding')
+        self.sweep_angle = kwargs.get('sweep_angle')
 
     def collide_point(self, x, y):
-        return Vector(self.pos).distance((x, y)) <= self.radius
+        point_dist = Vector(self.pos).distance((x, y))
+        return  point_dist<= self.radius and point_dist > self.radius-self.thickness
 
     def on_touch_down(self, touches, touchID, x, y):
         if self.collide_point(x, y):
@@ -37,21 +44,24 @@ class MTCircularScroller(MTWidget):
             
     def calculate_angle(self):
         self.angle = Vector(self.radius_line).angle(self.last_touch)
+        if self.angle > self.sweep_angle:
+            self.angle = self.sweep_angle
+            
  
     def on_draw(self):
         with gx_matrix_identity:
             set_color(*self.style.get('bg-color'))
             glTranslated(self.pos[0], self.pos[1], 0)
             glRotatef(-self.rotation, 0, 0, 1)
-            drawSemiCircle((0,0),self.radius-32,self.radius,32,1,0,360)
+            drawSemiCircle((0,0),self.radius-self.thickness,self.radius,32,1,0,self.sweep_angle)
             set_color(1,1,0,0.5)
-            drawSemiCircle((0,0),self.radius-24,self.radius-8,32,1,0,(360+self.angle) if self.angle<0 else self.angle)
+            drawSemiCircle((0,0),self.radius-self.thickness+self.padding,self.radius-self.padding,32,1,0,(360+self.angle) if self.angle<0 else self.angle)
             drawTriangle(pos=(0, 0), w=40, h=100)
 
 
 if __name__ == '__main__':
     w = MTWindow()
-    cm = MTCircularScroller(pos=(w.width/2,w.height/2),radius=150)
+    cm = MTCircularScroller(pos=(w.width/2,w.height/2),radius=300,thickness=100,padding=5,sweep_angle=360)
     w.add_widget(cm)
 
     runTouchApp()

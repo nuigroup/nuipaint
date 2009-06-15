@@ -25,23 +25,23 @@ class MTIconObject(MTButton):
         self.label_txt = kwargs.get('label')
         self.type_image = None
         if os.path.isdir(self.filename):
-            self.type_image = 'core/filebrowser/icons/folder.png'
+            self.type_image = 'core/ui/filebrowser/icons/folder.png'
         else:
             ext = self.label_txt.split('.')[-1]
             if ext in ['jpg', 'jpeg']:
-                self.type_image = 'core/filebrowser/icons/image-jpeg.png'
+                self.type_image = 'core/ui/filebrowser/icons/image-jpeg.png'
             elif ext in ['svg']:
-                self.type_image = 'core/filebrowser/icons/image-svg.png'
+                self.type_image = 'core/ui/filebrowser/icons/image-svg.png'
             elif ext in ['png']:
-                self.type_image = 'core/filebrowser/icons/image-png.png'
+                self.type_image = 'core/ui/filebrowser/icons/image-png.png'
             elif ext in ['bmp']:
-                self.type_image = 'core/filebrowser/icons/image-bmp.png'
+                self.type_image = 'core/ui/filebrowser/icons/image-bmp.png'
             elif ext in ['gif']:
-                self.type_image = 'core/filebrowser/icons/image-gif.png'
+                self.type_image = 'core/ui/filebrowser/icons/image-gif.png'
             elif ext in ['mpg', 'mpeg', 'avi', 'mkv', 'flv']:
-                self.type_image = 'core/filebrowser/icons/video.png'
+                self.type_image = 'core/ui/filebrowser/icons/video.png'
             else:
-                self.type_image = 'core/filebrowser/icons/unknown.png'
+                self.type_image = 'core/ui/filebrowser/icons/unknown.png'
         self.size           = (80, 80)                
         img            = pyglet.image.load(self.type_image)
         self.image     = pyglet.sprite.Sprite(img)
@@ -83,7 +83,7 @@ class MTFileBrowser(MTScatterWidget):
         self.kb.pos=(10,10)
         self.dl = GlDisplayList()
         self.path = '.'
-        self.close_button = MTImageButton(filename="core/filebrowser/close.png")
+        self.close_button = MTImageButton(filename="core/ui/filebrowser/close.png")
         self.close_button.pos = (self.width-self.close_button.width,self.height-self.close_button.height)
         self.add_widget(self.close_button,"front")
         @self.close_button.event

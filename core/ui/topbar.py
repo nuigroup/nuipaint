@@ -1,8 +1,8 @@
 from __future__ import with_statement
 from pymt import *
 from pyglet.gl import *
-from core.toolbar import toolbarHolder
-from core.iconbutton import MTIconButton
+from core.ui.toolbar import toolbarHolder
+from core.ui.iconbutton import MTIconButton
 
 class topBar(MTWidget):
     def __init__(self, **kwargs):

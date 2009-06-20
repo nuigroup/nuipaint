@@ -13,6 +13,7 @@ if __name__ == '__main__':
     #File Browser
     fb = MTFileBrowser(pos=(100,500),size=(400,300))
     w.add_widget(fb)
+    fb.hide()
     #Bottom Toolbar
     tb = toolbar(win=w,canvas=cv)
     w.add_widget(tb)

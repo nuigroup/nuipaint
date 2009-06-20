@@ -34,6 +34,7 @@ class Canvas(MTScatterWidget):
             elif self.mode == "zoom":
                 super(Canvas, self).on_touch_down(touches, touchID, x, y)
             elif self.mode == "smudge":
+                #self.do_smudge(self.touch_positions[touchID][0],self.touch_positions[touchID][1])
                 pass
                 #glReadPixels(x, y, 32, 32, GL_RGB, GL_FLOAT, self.pixel_holder)
                 #self.do_smudge(x,y,self.pixel_holder)
@@ -66,7 +67,81 @@ class Canvas(MTScatterWidget):
         
     def set_brush_color(self,color):
         self.brush_color = color
+    
+    """def do_smudge(self, x, y):
+        # First, extract region from texture
+        region = self.fbo.texture.get_region(x - 16, y - 16, 32, 32)
+        print region.height,region.width
+        data = region.get_image_data()
+        print data.height, data.width
+        print data.pitch
+        #data.save(file="test.png")        
         
+        with self.fbo:
+            drawTexturedRectangle(region, pos=(0,0), size=(32, 32))
+        
+        # Extract pixels
+                
+        format = 'RGBA'
+        pitch = 32 * 4       
+        pixel = data.get_data(format, pitch)
+        #pixels= map(ord, list(pixel)) 
+        print "pix:",pixel
+        
+    """    
+    """print "data: ",data
+        format = data._current_format
+        pitch = data._current_pitch
+        print 'SMUDGE: format is', format
+        print 'SMUDGE: pitch is', pitch
+        pixels = data.get_data(data._current_format, data._current_pitch)
+        print "pixels: ",pixels
+        """
+    """ print "-------------------"
+        #print "data:",data
+
+        # Initialize state for smudge
+        if not hasattr(self, 'state_smudge'):
+            self.state_smudge = {}
+            self.state_smudge_pitch = 32 * 3
+            for i in xrange(0, 32 * 32 * 3):
+                self.state_smudge[i] = 0
+
+        # Do smudge
+        for i in xrange(0, 32 * 32):
+            iy = i >> 5
+            ix = i & 0x1f
+
+            # Change pixel only in the circle with 16 pixel diameter
+            if ((ix - 16) * (ix - 16) + (iy - 16) * (iy - 16) > 120):
+                continue
+
+            # Get color
+            r = pixels[ix + iy * pitch]
+            g = pixels[ix + iy * pitch + 1]
+            b = pixels[ix + iy * pitch + 2]
+
+            # Update state
+            state[ix + iy * self.state_smudge_pitch] =\
+                rate * state[ix + iy * self.state_smudge_pitch] + (1.0 - rate) * r;
+            state[ix + iy * self.state_smudge_pitch + 1] =\
+                rate * state[ix + iy * self.state_smudge_pitch + 2] + (1.0 - rate) * g;
+            state[ix + iy * self.state_smudge_pitch + 2] =\
+                rate * state[ix + iy * self.state_smudge_pitch + 2] + (1.0 - rate) * b;
+
+            # Put pixels
+            pixels[ix + iy * pitch] = state[ix + iy * self.state_smudge_pitch]
+            pixels[ix + iy * pitch + 1] = state[ix + iy * self.state_smudge_pitch + 1]
+            pixels[ix + iy * pitch + 2] = state[ix + iy * self.state_smudge_pitch + 2]
+
+        # Construct a texture from the new pixels
+        data.set_data(format, pitch, pixels)
+        texture = data.get_texture()
+
+        # Draw texture on Fbo
+        with self.fbo:
+            drawTexturedRectangle(texture, pos=(x - 16, y - 16), size=(32, 32))
+    """
     """def do_smudge(self,x,y,buffer):
         temp = (GLfloat * 3072)(0)
         rate=0.5

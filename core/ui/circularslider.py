@@ -23,22 +23,20 @@ class MTCircularScroller(MTWidget):
         self.sweep_angle = kwargs.get('sweep_angle')
         self.slider_fill_angle = 0.0
         self.slider_color = kwargs.get('slider_color')
-
+    
     def collide_point(self, x, y):
+        #A algorithm to find the whether a touch is within a semi ring
         point_dist = Vector(self.pos).distance((x, y))
-        return  point_dist<= self.radius and point_dist > self.radius-self.thickness
+        point_angle = Vector(self.radius_line).angle((x - self.pos[0], y - self.pos[1]))
+        if point_angle < 0:
+           point_angle=360+point_angle
+        if point_angle <= self.sweep_angle and point_angle >=0:
+            return  point_dist<= self.radius and point_dist > self.radius-self.thickness
 
     def on_touch_down(self, touches, touchID, x, y):
         if self.collide_point(x, y):
-            prev_angle = self.slider_fill_angle
             self.last_touch = (x - self.pos[0], y - self.pos[1])
             self.calculate_angle()
-            if self.angle<0:
-                if 360+self.angle > self.sweep_angle: #If touch is beyond the bound of sliders area
-                    self.slider_fill_angle = prev_angle
-            else:
-                if self.angle > self.sweep_angle:
-                    self.slider_fill_angle = prev_angle
             return True
     
     def on_touch_up(self, touches, touchID, x, y):
@@ -47,16 +45,8 @@ class MTCircularScroller(MTWidget):
             
     def on_touch_move(self, touches, touchID, x, y):
         if self.collide_point(x, y):
-            prev_angle = self.slider_fill_angle
             self.last_touch = (x - self.pos[0], y - self.pos[1])
             self.calculate_angle()            
-            if self.angle<0:
-                if 360+self.angle > self.sweep_angle:     #If touch is beyond the bound of sliders area
-                    self.slider_fill_angle = prev_angle
-            else:
-                if self.angle > self.sweep_angle:
-                    self.slider_fill_angle = prev_angle
-            
             return True
             
     def calculate_angle(self):
@@ -65,7 +55,6 @@ class MTCircularScroller(MTWidget):
             self.slider_fill_angle = self.angle+360
         else:
             self.slider_fill_angle = self.angle
-        #print self.slider_fill_angle
  
     def on_draw(self):
         with gx_matrix_identity:
@@ -75,12 +64,12 @@ class MTCircularScroller(MTWidget):
             drawSemiCircle((0,0),self.radius-self.thickness,self.radius,32,1,0,self.sweep_angle)
             set_color(*self.slider_color)
             drawSemiCircle((0,0),self.radius-self.thickness+self.padding,self.radius-self.padding,32,1,0,self.slider_fill_angle)
-            #drawTriangle(pos=(0, 0), w=40, h=100)
+
 
 
 if __name__ == '__main__':
     w = MTWindow()
-    cm = MTCircularScroller(pos=(w.width/2,w.height/2),radius=300,thickness=100,padding=5,sweep_angle=90,slider_color=(1,0,0,0.5),rotation=-45)
+    cm = MTCircularScroller(pos=(w.width/2-200,w.height/2),radius=300,thickness=100,padding=5,sweep_angle=130,slider_color=(1,0,0,0.5),rotation=-60)
     w.add_widget(cm)
     
     cm2 = MTCircularScroller(pos=(w.width/2-100,w.height/2-100),radius=150,thickness=70,padding=5,sweep_angle=135,slider_color=(1,1,0,0.5),rotation=55)

@@ -34,8 +34,8 @@ class Canvas(MTScatterWidget):
             elif self.mode == "zoom":
                 super(Canvas, self).on_touch_down(touches, touchID, x, y)
             elif self.mode == "smudge":
-                #self.do_smudge(self.touch_positions[touchID][0],self.touch_positions[touchID][1])
-                pass
+                self.do_smudge(self.touch_positions[touchID][0],self.touch_positions[touchID][1])
+                #pass
                 #glReadPixels(x, y, 32, 32, GL_RGB, GL_FLOAT, self.pixel_holder)
                 #self.do_smudge(x,y,self.pixel_holder)
             return True
@@ -68,37 +68,18 @@ class Canvas(MTScatterWidget):
     def set_brush_color(self,color):
         self.brush_color = color
     
-    """def do_smudge(self, x, y):
+    def do_smudge(self, x, y):
         # First, extract region from texture
-        region = self.fbo.texture.get_region(x - 16, y - 16, 32, 32)
-        print region.height,region.width
+        region = self.fbo.texture.get_region(int(x) - 16, int(y) - 16, 32, 32)
         data = region.get_image_data()
-        print data.height, data.width
-        print data.pitch
-        #data.save(file="test.png")        
-        
-        with self.fbo:
-            drawTexturedRectangle(region, pos=(0,0), size=(32, 32))
-        
-        # Extract pixels
-                
+        data.save(file="test.png")        
+        # Extract pixels                
         format = 'RGBA'
         pitch = 32 * 4       
-        pixel = data.get_data(format, pitch)
-        #pixels= map(ord, list(pixel)) 
-        print "pix:",pixel
+        pixels = data.get_data(format, pitch)
+        data.save(file="test.png")
         
-    """    
-    """print "data: ",data
-        format = data._current_format
-        pitch = data._current_pitch
-        print 'SMUDGE: format is', format
-        print 'SMUDGE: pitch is', pitch
-        pixels = data.get_data(data._current_format, data._current_pitch)
-        print "pixels: ",pixels
-        """
-    """ print "-------------------"
-        #print "data:",data
+        rate = 0.5
 
         # Initialize state for smudge
         if not hasattr(self, 'state_smudge'):
@@ -141,7 +122,7 @@ class Canvas(MTScatterWidget):
         # Draw texture on Fbo
         with self.fbo:
             drawTexturedRectangle(texture, pos=(x - 16, y - 16), size=(32, 32))
-    """
+
     """def do_smudge(self,x,y,buffer):
         temp = (GLfloat * 3072)(0)
         rate=0.5

@@ -6,7 +6,7 @@ from math import degrees,sqrt,acos,pi,cos,sin,radians
 def drawSemiCircle(pos=(0,0), inner_radius=100,outer_radius=100,slices=32,loops=1,start_angle=0,sweep_angle=0):
     gluPartialDisk(gluNewQuadric(), inner_radius, outer_radius, slices, loops, start_angle,sweep_angle )
 
-class MTCircularScroller(MTWidget): 
+class MTCircularSlider(MTWidget): 
     def __init__(self, **kwargs):
         kwargs.setdefault('min', 0)
         kwargs.setdefault('max', 100)
@@ -14,7 +14,7 @@ class MTCircularScroller(MTWidget):
         kwargs.setdefault('thickness', 40)
         kwargs.setdefault('padding', 3)
         kwargs.setdefault('sweep_angle', 90)
-        super(MTCircularScroller, self).__init__(**kwargs)
+        super(MTCircularSlider, self).__init__(**kwargs)
         self.radius = kwargs.get('radius')        
         self.last_touch = (0, 0)
         self.angle = 0.0
@@ -44,12 +44,13 @@ class MTCircularScroller(MTWidget):
             return  point_dist<= self.radius and point_dist > self.radius-self.thickness
             
     def on_value_change(self, value):
-        return
+        pass
 
     def on_touch_down(self, touches, touchID, x, y):
         if self.collide_point(x, y):
             self.touchstarts.append(touchID)
             self.last_touch = (x - self.pos[0], y - self.pos[1])
+            self._value = (self.slider_fill_angle) * (self.max - self.min) / self.sweep_angle + self.min 
             self.calculate_angle()
             return True
     
@@ -60,8 +61,8 @@ class MTCircularScroller(MTWidget):
     def on_touch_move(self, touches, touchID, x, y):
         if self.collide_point(x, y) and touchID in self.touchstarts:
             self.last_touch = (x - self.pos[0], y - self.pos[1])
-            self.calculate_angle() 
-            self._value = (self.slider_fill_angle) * (self.max - self.min) / self.sweep_angle + self.min            
+            self._value = (self.slider_fill_angle) * (self.max - self.min) / self.sweep_angle + self.min 
+            self.calculate_angle()
             return True
             
     def calculate_angle(self): 
@@ -80,6 +81,11 @@ class MTCircularScroller(MTWidget):
             drawSemiCircle((0,0),self.radius-self.thickness,self.radius,32,1,0,self.sweep_angle)
             set_color(*self.slider_color)
             drawSemiCircle((0,0),self.radius-self.thickness+self.padding,self.radius-self.padding,32,1,0,self.slider_fill_angle)
+    
+    def set_initial_value(self,value):
+        self.slider_fill_angle = float(value)/float(100)*self.sweep_angle
+        self._value = float(value)/float(100)*self.max
+    
 
 
 

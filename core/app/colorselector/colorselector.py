@@ -2,7 +2,8 @@ from __future__ import with_statement
 from pymt import *
 from pyglet.gl import *
 from math import sin,cos,radians,sqrt
-from core.ui.circularslider import MTCircularScroller
+from core.ui.circularslider import MTCircularSlider
+from colorsys import rgb_to_hsv,hsv_to_rgb
 
        
 def drawPartialCircle(pos=(0,0), radius=100):
@@ -15,7 +16,8 @@ def drawPartialCircle(pos=(0,0), radius=100):
 
 def drawSemiCircle(pos=(0,0), inner_radius=100,outer_radius=100,slices=32,loops=1,start_angle=0,sweep_angle=0):
     gluPartialDisk(gluNewQuadric(), inner_radius, outer_radius, slices, loops, start_angle,sweep_angle )
-    
+   
+
 
 class MTColorSelector(MTWidget):
     def __init__(self, **kwargs):
@@ -24,11 +26,24 @@ class MTColorSelector(MTWidget):
         self.canvas = kwargs.get('canvas')
         self.back_color = (0.0,0.0,0.0)
         self.parent_win = kwargs.get('win')
-        self.slider = MTCircularScroller(pos=(self.parent_win.width,0),radius=223,thickness=20,padding=2,sweep_angle=60,slider_color=(1,1,1,1),rotation=-87,min=0,max=1)
+        self.slider = MTCircularSlider(pos=(self.parent_win.width,0),radius=223,thickness=20,padding=2,sweep_angle=85,slider_color=(1,1,1,1),rotation=-87,min=0,max=2)
         self.add_widget(self.slider)
+        self.slider.set_initial_value(value=50)
         self.current_color = (0,0,0,1)
         self.colorwheel = MTColorCircle(pos=(self.parent_win.width-200,0),size=(200,200),win=self.parent_win,canvas=self.canvas)
         self.add_widget(self.colorwheel)
+        
+        @self.slider.event
+        def on_value_change(value=self.slider.slider_color):
+            value = rgb_to_hsv(self.slider.slider_color[0],self.slider.slider_color[1],self.slider.slider_color[2])
+            h,s,v = value[0],value[1],value[2]
+            if self.slider._value <= 1.0:
+                s = self.slider._value
+            else:
+                v = 2-self.slider._value
+            self.canvas.set_brush_color(hsv_to_rgb(h,s,v))
+            self.slider.slider_color = hsv_to_rgb(h,s,v)
+
 
     def draw(self):
         set_color(*self.back_color)
@@ -36,11 +51,12 @@ class MTColorSelector(MTWidget):
             glTranslated(self.pos[0]+self.size[0], self.pos[1], 0)
             set_color(*self.style.get('bg-color'))
             drawSemiCircle(pos=self.pos, inner_radius=180,outer_radius=225,slices=32,loops=1,start_angle=-90,sweep_angle=90)
-            set_color(*self.back_color)
-            drawSemiCircle(pos=self.pos, inner_radius=205,outer_radius=220,slices=32,loops=1,start_angle=-23, sweep_angle=20)
+            #set_color(*self.back_color)
+            #drawSemiCircle(pos=self.pos, inner_radius=205,outer_radius=220,slices=32,loops=1,start_angle=-23, sweep_angle=20)
     
-    def set_backcolor(self,color):
-        self.back_color = color
+    def set_slider_data(self,color,value):
+        self.slider.slider_color = color
+        self.slider.set_initial_value(value=value)
         
 
 class MTColorCircle(MTWidget):
@@ -82,8 +98,9 @@ class MTColorCircle(MTWidget):
     def calculate_color(self):
         b = 1-self.point_distance/self.size[0]
         r = (sin(radians(self.point_angle))-b)*sqrt(2)
-        g = (cos(radians(self.point_angle))-b)*sqrt(2)
-       
-        self.parent.set_backcolor(color=(r,g,b))
+        g = (cos(radians(self.point_angle))-b)*sqrt(2)        
+        
+        self.parent.set_slider_data(color=(r,g,b),value=50)
+
         if(self.canvas):
             self.canvas.set_brush_color((r,g,b))        

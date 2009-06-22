@@ -55,13 +55,13 @@ class MTCircularMenu(MTWidget):
 
 if __name__ == '__main__':
     w = MTWindow()
-    cm = MTCircularMenu(pos=(0,0),radius=150)
+    cm = MTCircularMenu(pos=(w.width/2,w.height/2),radius=150)
     w.add_widget(cm)
-    for i in range (10):
-        teta = float((360/10)*i*(pi/180))
+    for i in range (12):
+        teta = float((360/12)*i*(pi/180))
         x =  int(90*cos(teta))
         y =  int(90*sin(teta))
-        im = MTImageButton(filename="gfx/icons/flickr.png",pos=(x,y))
+        im = MTImageButton(filename="../../../gfx/icons/flickr.png",pos=(x,y))
         cm.add_widget(im) 
 
     runTouchApp()

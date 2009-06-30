@@ -1,0 +1,100 @@
+"""
+    
+    def do_smudge(self, x, y):
+        # First, extract region from texture
+        region = self.fbo.texture.get_region(int(x) - 16, int(y) - 16, 32, 32)
+        data = region.get_image_data()
+        #data.save(file='test.png')
+       
+        # Extract pixels                
+        format = 'RGB'
+        pitch = 32 * len(format)       
+        pixel_data = data.get_data(format, pitch)
+        pixels = map(ord, list(pixel_data))
+        
+        #print pixels
+        
+        
+        state=zeros(3072, float)
+        rate = 0.5
+
+        # Initialize state for smudge
+        if not hasattr(self, 'state_smudge'):
+            self.state_smudge = {}
+            self.state_smudge_pitch = 32 * 3
+            for i in xrange(0, 32 * 32 * 3):
+                self.state_smudge[i] = 0
+                
+        # Do smudge
+        for i in xrange(0, 32 * 32):
+            iy = i >> 5
+            ix = i & 0x1f
+            #print ix,iy
+
+            # Change pixel only in the circle with 16 pixel diameter
+            if ((ix - 16) * (ix - 16) + (iy - 16) * (iy - 16) > 120):
+                continue
+
+            # Get color
+            r = float(pixels[ix * iy + pitch])/float(255)
+            g = float(pixels[ix * iy + pitch + 1])/float(255)
+            b = float(pixels[ix * iy + pitch + 2])/float(255)
+            if r > 255 or g >255 or b > 255:
+                #print ix,iy," before: ",r,g,b
+                continue
+            print r,g,b
+
+            # Update state
+            state[ix * iy + self.state_smudge_pitch] =\
+                rate * state[ix * iy + self.state_smudge_pitch] + (1.0 - rate) * r;
+            state[ix * iy + self.state_smudge_pitch + 1] =\
+                rate * state[ix * iy + self.state_smudge_pitch + 2] + (1.0 - rate) * g;
+            state[ix * iy + self.state_smudge_pitch + 2] =\
+                rate * state[ix * iy + self.state_smudge_pitch + 3] + (1.0 - rate) * b;
+
+            # Put pixels
+            pixels[ix * iy + pitch] = state[ix * iy + self.state_smudge_pitch]*float(255)
+            pixels[ix * iy + pitch + 1] = state[ix * iy + self.state_smudge_pitch + 1]*float(255)
+            pixels[ix * iy + pitch + 2] = state[ix * iy + self.state_smudge_pitch + 2]*float(255)            
+            
+            
+        # Construct a texture from the new pixels
+        data.set_data(format, pitch, ''.join(map(chr, pixels)))
+        data.save(file='test2.png')
+        texture = data.get_texture()
+
+        # Draw texture on Fbo
+        with self.fbo:
+            drawTexturedRectangle(texture, pos=(x - 16, y - 16), size=(32, 32))
+     
+	"""
+	
+    """
+    def do_smudge(self,x,y,buffer):
+        temp = (GLfloat * 3072)(0)
+        rate=0.5
+        for i in range(3027,0,-3):
+            iy = i >> 5;
+            ix = i & 0x1f;
+            # is it not on the circle of radius sqrt(120) at location 16,16?
+            #if ((ix - 16) * (ix - 16) + (iy - 16) * (iy - 16) > 120):
+            #    print i            
+            #continue
+            
+            # it is on the circle, so grab it        
+            temp[i-3] = rate * temp[i-3] + (1.0 - rate) * buffer[i-3]            
+            temp[i-2] = rate * temp[i-2] + (1.0 - rate) * buffer[i-2]
+            temp[i-1] = rate * temp[i-1] + (1.0 - rate) * buffer[i-1]
+
+        self.fbo.bind()
+  
+        self.fbo.release()
+            
+
+        
+    // opacity 100% --> new data not blended w/ existing data
+    api->putpixel(canvas, x + ix - 16, y + iy - 16,
+             SDL_MapRGB(canvas->format, api->linear_to_sRGB(state[ix][iy][0]),
+                        api->linear_to_sRGB(state[ix][iy][1]),
+                        api->linear_to_sRGB(state[ix][iy][2])));
+  }"""

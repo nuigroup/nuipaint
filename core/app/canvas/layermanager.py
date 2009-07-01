@@ -13,21 +13,55 @@ class LayerManager(MTScatterWidget):
         self.canvas = kwargs.get('canvas')
         self.size = self.canvas.size
         self.layer_list = []
-        self.background = Layer(size=self.canvas.size,color=(1,1,1,1),moveable=False,layer_manager=self)
+        self.background = NormalLayer(size=self.canvas.size,color=(1,1,1,1),moveable=False,layer_manager=self)
         self.add_widget(self.background)
-        self.layer1 = Layer(pos=(100,100),size=(200,200),color=(1,0,0,0.5),layer_manager=self)
-        self.add_widget(self.layer1)
-        self.layer2 = Layer(size=(300,200),color=(0,1,0,0.5),layer_manager=self)
-        self.add_widget(self.layer2)
-        self.layer3 = Layer(size=(250,150),color=(0,0,1,0.5),layer_manager=self)
-        self.add_widget(self.layer3)
-        
-        self.layer_list.append(self.layer1)
-        self.layer_list.append(self.layer2)
-        self.layer_list.append(self.layer3)
+
         
     def set_mode(self,value):
         self.mode = value
+        
+    def move_layer_up(self,layer_id):  #double tapp on the layer to move up one layer at a time
+        if layer_id < len(self.layer_list)-1:
+            a = self.layer_list[layer_id]
+            b = self.layer_list[layer_id+1]
+            a.id = layer_id+1
+            b.id = layer_id
+            
+            self.layer_list[layer_id] = b
+            self.layer_list[layer_id+1] = a
+            
+            for layer in self.layer_list:
+                self.remove_widget(layer)
+                
+            for layer in self.layer_list:
+                self.add_widget(layer)
+
+    def move_layer_down(self,layer_id): #hold one finger down and double tapp with another on the layer to move down one layer at a time
+        if layer_id > 0:
+            a = self.layer_list[layer_id]
+            b = self.layer_list[layer_id-1]
+            a.id = layer_id-1
+            b.id = layer_id
+            
+            self.layer_list[layer_id] = b
+            self.layer_list[layer_id-1] = a
+            
+            for layer in self.layer_list:
+                self.remove_widget(layer)
+                
+            for layer in self.layer_list:
+                self.add_widget(layer) 
+        
+        
+    def create_layer(self,pos=(0,0),size=(200,200),color=(0,0,0,0.5)):
+        layer = NormalLayer(id=len(self.layer_list),pos=pos,size=size,color=color,layer_manager=self)
+        self.add_widget(layer)
+        self.layer_list.append(layer)
+    
+    
+    
+        
+
         
     
         

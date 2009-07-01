@@ -25,7 +25,9 @@ class specialScatterW(MTScatterWidget):
 
 class Layer(specialScatterW):
     def __init__(self, **kwargs):
+        kwargs.setdefault('layer_manager', None)
         self.moveable = kwargs.get('moveable')
+        self.layer_manager = kwargs.get('layer_manager')
         if self.moveable == False :
             kwargs.setdefault('do_scale', False)
             kwargs.setdefault('do_rotation', False)
@@ -35,8 +37,6 @@ class Layer(specialScatterW):
         self.color = kwargs.get('color')
         set_brush('brushes/brush_particle.png')
         self.layer_clear()
-        self.touch_positions = {}
-        self.mode = "zoom"
         set_brush_size(25)
         self.brush_color=(0,0,0,1)
 
@@ -50,41 +50,51 @@ class Layer(specialScatterW):
 
     def on_touch_down(self, touches, touchID, x, y):
         if self.collide_point(x,y): 
-            self.touch_positions[touchID] = self.to_local(x,y)            
-            if self.mode == "draw":
+            self.touches[touchID] = self.to_local(x,y)
+            if self.layer_manager.mode == "draw":
                 self.fbo.bind()
                 set_color(*self.brush_color)
                 set_brush('brushes/brush_particle.png')
                 set_brush_size(25)
                 drawCircle(pos=self.to_local(x,y), radius=1)            
                 self.fbo.release()
-            elif self.mode == "zoom":
+            elif self.layer_manager.mode == "zoom":
                 super(Layer, self).on_touch_down(touches, touchID, x, y)
 
             return True
             
     def on_touch_move(self, touches, touchID, x, y):
-        if self.touch_positions.has_key(touchID):
-            if self.mode == "zoom":
+        if touchID in self.touches:
+            if self.layer_manager.mode == "zoom":
                 super(Layer, self).on_touch_move(touches, touchID, x, y)
-            elif self.mode == "draw":
+            elif self.layer_manager.mode == "draw":
                 cur_pos = self.to_local(x,y)
-                ox,oy = self.touch_positions[touchID]
+                ox,oy = self.touches[touchID]
                 self.fbo.bind()
                 set_color(*self.brush_color)
                 set_brush('brushes/brush_particle.png')
                 set_brush_size(25)
                 paintLine((ox,oy,cur_pos[0],cur_pos[1]))
                 self.fbo.release()
-                self.touch_positions[touchID] = self.to_local(x,y)
+                self.touches[touchID] = self.to_local(x,y)
             return True
+            
+    def on_touch_up(self, touches, touchID, x,y):
+        if touchID in self.touches:
+            del self.touches[touchID]
+            return True
+            
 
     def draw(self):
         with gx_matrix:
-           glColor4f(*self.color)
-           drawRectangle((0,0),(self.width,self.height))
-           #with gx_blending:
-           #     drawTexturedRectangle(self.fbo.texture, (-6,-6),(self.width+12,self.height+12))
+            #glColor4f(*self.color)
+            if self.moveable == False :
+                glColor4f(*self.color)
+                drawRectangle((0,0),(self.width,self.height))
+            with gx_blending:
+                glColor4f(self.color[0],self.color[1],self.color[2],0.5)
+                drawRectangle((0,0),(self.width,self.height))
+                drawTexturedRectangle(self.fbo.texture, (-6,-6),(self.width+12,self.height+12))
     
     def set_mode(self,mode):
         self.mode = mode

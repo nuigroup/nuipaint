@@ -13,6 +13,9 @@ class Canvas(MTScatterWidget):
         with gx_matrix:
             glColor4f(0,0,0,1)
             drawRectangle((0,0),(self.width,self.height))
+    
+    def set_mode(self,mode):
+        self.canvas_area.layer_manager.set_mode(mode)
 
 class CanvasArea(MTStencilContainer):
     def __init__(self, **kwargs):
@@ -28,8 +31,18 @@ class CanvasArea(MTStencilContainer):
 		
 if __name__ == '__main__':
     w = MTWindow()
-    canvas = Canvas(size=(520,420))
-    w.add_widget(canvas)    
+    canvas = Canvas(size=(520,420),pos=(w.width/2-260,w.height/2-120))
+    w.add_widget(canvas)
+    draw_but = MTButton(label="Painting")
+    w.add_widget(draw_but)
+    @draw_but.event    
+    def on_press(touchID, x, y):
+        canvas.set_mode(mode='draw')
+    zoom_but = MTButton(label="Layering",pos=(draw_but.width+5,0))
+    @zoom_but.event    
+    def on_press(touchID, x, y):
+        canvas.set_mode(mode='zoom')
+    w.add_widget(zoom_but)
     runTouchApp()
     		
 		

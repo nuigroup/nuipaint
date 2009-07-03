@@ -30,17 +30,16 @@ class AbstractLayer(specialScatterW):
         self.fbo = Fbo(size=(self.width, self.height), with_depthbuffer=False)                
         self.color = kwargs.get('color')
         set_brush('brushes/brush_particle.png',25)
-        #self.layer_clear()
+        self.layer_clear()
         self.brush_color=(0,0,0,1)
         self.id = kwargs.get('id')
 
     def layer_clear(self):
-        self.fbo.bind()
-        #glClearColor(1,1,1,1)
-        #glClear(GL_COLOR_BUFFER_BIT)
-        set_color(self.color)
-        drawRectangle((0,0),(self.width,self.height))
-        self.fbo.release()
+        with self.fbo:
+            glClearColor(1,1,1,1)
+            glClear(GL_COLOR_BUFFER_BIT)
+            set_color(self.color)
+            drawRectangle((0,0),(self.width,self.height))
 
     def on_touch_down(self, touches, touchID, x, y):
         if self.collide_point(x,y): 
@@ -49,7 +48,7 @@ class AbstractLayer(specialScatterW):
                 if touches[touchID].is_double_tap:
                     self.layer_manager.move_layer_down(self.id)
             elif touches[touchID].is_double_tap:
-                self.layer_manager.move_layer_up(self.id)
+               self.layer_manager.move_layer_up(self.id)
             if self.layer_manager.mode == "draw":
                 with self.fbo:
                     set_color(*self.brush_color)
@@ -69,8 +68,7 @@ class AbstractLayer(specialScatterW):
                 with self.fbo:
                     set_color(*self.brush_color)
                     set_brush('brushes/brush_particle.png',25)
-                    paintLine((ox,oy,cur_pos[0],cur_pos[1]))
-                    self.fbo.release()
+                    paintLine((ox,oy,cur_pos[0],cur_pos[1]))                    
                 self.touches[touchID] = self.to_local(x,y)
             return True
             

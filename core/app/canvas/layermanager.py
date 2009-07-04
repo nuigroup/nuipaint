@@ -11,14 +11,25 @@ class LayerManager(MTScatterWidget):
         super(LayerManager, self).__init__(**kwargs)
         self.mode = "zoom"
         self.canvas = kwargs.get('canvas')
-        self.size = self.canvas.size
+        #self.size = self.canvas.size
         self.layer_list = []
-        self.background = NormalLayer(size=self.canvas.size,color=(1,1,1,1),moveable=False,layer_manager=self)
+        self.brush_color = (0,0,0,1)
+        self.brush_sprite = "brushes/brush_particle.png"
+        self.brush_size = 25
+        self.background = NormalLayer(size=self.size,color=(1,1,1,1),moveable=False,layer_manager=self)
         self.add_widget(self.background)
+
 
         
     def set_mode(self,value):
         self.mode = value
+        
+    def set_brush_color(self,color):
+        self.brush_color = color
+    
+    def set_brush(self,sprite,size):
+        self.brush_sprite = sprite
+        self.brush_size = size
         
     def move_layer_up(self,layer_id):  #double tapp on the layer to move up one layer at a time
         if layer_id < len(self.layer_list)-1:

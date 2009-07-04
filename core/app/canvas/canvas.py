@@ -1,131 +1,75 @@
 from __future__ import with_statement
 from pymt import *
 from pyglet.gl import *
-from numpy import *
-import string
+from layermanager import *
 
 class Canvas(MTScatterWidget):
     def __init__(self, **kwargs):
         super(Canvas, self).__init__(**kwargs)
-        self.width = 500
-        self.height = 400
+        self.canvas_area = MTStencilContainer(pos=(20,20),size=(self.width-40,self.height-40))
+        self.add_widget(self.canvas_area)
+        self.layer_manager = LayerManager(pos=(20,20),canvas=self,size=(self.width-40,self.height-40))
+        self.canvas_area.add_widget(self.layer_manager)
         self.fbo = Fbo(size=(self.width, self.height), with_depthbuffer=False)
-        self.color = (0,1,0,1.0)
-        set_brush('brushes/brush_particle.png')
-        self.layer_clear()
-        self.touch_positions = {}
-        self.mode = "zoom"
-        set_brush_size(25)
-        self.brush_color=(0,0,0,1)
-
-    def layer_clear(self):
-        self.fbo.bind()
-        glClearColor(0,0,0,0)
-        glClear(GL_COLOR_BUFFER_BIT)
-        self.fbo.release()
-
-    def on_touch_down(self, touches, touchID, x, y):
-        if self.collide_point(x,y): 
-            self.touch_positions[touchID] = self.to_local(x,y)            
-            if self.mode == "draw":
-                self.fbo.bind()
-                set_color(*self.brush_color)
-                set_brush('brushes/brush_particle.png')
-                set_brush_size(25)
-                drawCircle(pos=self.to_local(x,y), radius=1)            
-                self.fbo.release()
-            elif self.mode == "zoom":
-                super(Canvas, self).on_touch_down(touches, touchID, x, y)
-            elif self.mode == "smudge":
-                self.do_smudge(self.touch_positions[touchID][0],self.touch_positions[touchID][1])
-
-            return True
-            
-    def on_touch_move(self, touches, touchID, x, y):
-        if self.touch_positions.has_key(touchID):
-            if self.mode == "zoom":
-                super(Canvas, self).on_touch_move(touches, touchID, x, y)
-            elif self.mode == "draw":
-                cur_pos = self.to_local(x,y)
-                ox,oy = self.touch_positions[touchID]
-                self.fbo.bind()
-                set_color(*self.brush_color)
-                set_brush('brushes/brush_particle.png')
-                set_brush_size(25)
-                paintLine((ox,oy,cur_pos[0],cur_pos[1]))
-                self.fbo.release()
-                self.touch_positions[touchID] = self.to_local(x,y)
-            return True
-
+		
     def draw(self):
         with gx_matrix:
-            glColor4f(1,1,1,1)
-            drawRectangle((-6,-6),(self.width+12,self.height+12))
-            glScaled(float(self.width)/500, float(self.height)/400, 2.0)            
-            with gx_blending:
-                drawTexturedRectangle(self.fbo.texture, (-6,-6),(self.width+12,self.height+12))
-
+            glColor4f(0,0,0,1)
+            drawRectangle((0,0),(self.width,self.height))
+            
     def set_mode(self,mode):
-        self.mode = mode
+        self.layer_manager.set_mode(mode)
+
+    def create_layer(self,pos=(0,0),size=(200,200),color=(0,0,0,0.5)):
+        self.layer_manager.create_layer(pos=pos,size=size,color=color)
+        
+    def save_image(self):
+        with self.fbo:
+            self.layer_manager.background.dispatch_event('on_draw')
+            for layer in self.layer_manager.layer_list :
+                layer.dispatch_event('on_draw')
+		data = (self.fbo.texture).get_image_data()
+        data.save(file='test.png')
         
     def set_brush_color(self,color):
-        self.brush_color = color
+        self.layer_manager.set_brush_color(color)
+    
+    def set_brush(self,sprite,size):
+        self.layer_manager.set_brush(sprite,size)
         
-        
-    def do_smudge(self, x, y):
-        # First, extract region from texture
-        region = self.fbo.texture.get_region(int(x) - 16, int(y) - 16, 32, 32)
-        data = region.get_image_data()
-        # Extract pixels                
-        format = 'RGB'
-        pitch = 32 * len(format)       
-        pixel_data = data.get_data(format, pitch)
-        pixels_list = map(ord, list(pixel_data))
+    def collide_point(self, x,y):
+        local_coords = self.to_local(x,y)
+        if local_coords[0] > 0 and local_coords[0] < self.width \
+           and local_coords[1] > 0 and local_coords[1] < self.height:
+            return True
+        else:
+            return False
 		
-        pixels = zeros((32,32,3), float)
-        z = 0
-        for i in range(0,31):
-            for j in range(0,31):
-                for k in range(0,2):
-                    pixels[i,j,k] = pixels_list[z]
-                    z += 1				
-        #work
-        state=zeros((32,32,3), float)
-        rate = 0.5
-        
-        #i = 32 * 32;
-        for i in range (32*32,0,-1) :
-            iy = i >> 5
-            ix = i & 0x1f
-            # is it not on the circle of radius sqrt(120) at location 16,16?
-            if (ix - 16) * (ix - 16) + (iy - 16) * (iy - 16) > 120 :
-                continue
-            # it is on the circle, so grab it
-            
-            # Get color
-            r = float(pixels[ix,iy,0])/float(255)
-            g = float(pixels[ix,iy,1])/float(255)
-            b = float(pixels[ix,iy,02])/float(255)
-            #print r,g,b
-			
-            state[ix,iy,0] = rate * state[ix,iy,0] + (1.0 - rate) * r
-            state[ix,iy,1] = rate * state[ix,iy,1] + (1.0 - rate) * g
-            state[ix,iy,2] = rate * state[ix,iy,2] + (1.0 - rate) * b
-        
-        #put back pixel
-        z = 0
-        for i in range(0,31):
-            for j in range(0,31):
-                for k in range(0,2):
-                    pixels_list[z] = pixels[i,j,k]
-                    z += 1
-					
-        data.set_data(format, pitch, ''.join(map(chr, pixels_list)))
-        texture = data.get_texture()
-
-        # Draw texture on Fbo
-        with self.fbo:
-            drawTexturedRectangle(texture, pos=(x - 16, y - 16), size=(32, 32))    
+if __name__ == '__main__':
+    w = MTWindow()
+    canvas = Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120))
+    w.add_widget(canvas)
+    draw_but = MTButton(label="Painting")
+    w.add_widget(draw_but)
+    @draw_but.event    
+    def on_press(touchID, x, y):
+        canvas.set_mode(mode='draw')
+    zoom_but = MTButton(label="Layering",pos=(draw_but.width+5,0))
+    w.add_widget(zoom_but)
+    @zoom_but.event    
+    def on_press(touchID, x, y):
+        canvas.set_mode(mode='zoom')
     
+    add_but = MTButton(label="Save",pos=(draw_but.width+zoom_but.width+10,0))
+    @add_but.event    
+    def on_press(touchID, x, y):
+        canvas.save_image()
+    w.add_widget(add_but)
     
-        
+    canvas.create_layer(pos=(100,100),size=(200,200),color=(1,0,0,0.8))
+    canvas.create_layer(size=(300,200),color=(0,1,0,0.8))
+    canvas.create_layer(size=(250,150),color=(0,0,1,0.8))
+    runTouchApp()
+    		
+		
+	

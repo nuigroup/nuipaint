@@ -28,10 +28,8 @@ class AbstractLayer(specialScatterW):
         self.layer_manager = kwargs.get('layer_manager')        
         super(AbstractLayer, self).__init__(**kwargs)
         self.fbo = Fbo(size=(self.width, self.height), with_depthbuffer=False)                
-        self.color = kwargs.get('color')
-        set_brush('brushes/brush_particle.png',25)
+        self.color = kwargs.get('color')        
         self.layer_clear()
-        self.brush_color=(0,0,0,1)
         self.id = kwargs.get('id')
 
     def layer_clear(self):
@@ -51,8 +49,8 @@ class AbstractLayer(specialScatterW):
                self.layer_manager.move_layer_up(self.id)
             if self.layer_manager.mode == "draw":
                 with self.fbo:
-                    set_color(*self.brush_color)
-                    set_brush('brushes/brush_particle.png',25)
+                    set_color(*self.layer_manager.brush_color)
+                    set_brush(self.layer_manager.brush_sprite,self.layer_manager.brush_size)
                     drawCircle(pos=self.to_local(x,y), radius=1)                
             elif self.layer_manager.mode == "zoom":
                 super(AbstractLayer, self).on_touch_down(touches, touchID, x, y)
@@ -66,8 +64,8 @@ class AbstractLayer(specialScatterW):
                 cur_pos = self.to_local(x,y)
                 ox,oy = self.touches[touchID]
                 with self.fbo:
-                    set_color(*self.brush_color)
-                    set_brush('brushes/brush_particle.png',25)
+                    set_color(*self.layer_manager.brush_color)
+                    set_brush(self.layer_manager.brush_sprite,self.layer_manager.brush_size)
                     paintLine((ox,oy,cur_pos[0],cur_pos[1]))                    
                 self.touches[touchID] = self.to_local(x,y)
             return True
@@ -76,9 +74,7 @@ class AbstractLayer(specialScatterW):
         if touchID in self.touches:
             del self.touches[touchID]
             return True
-        
-    def set_brush_color(self,color):
-        self.brush_color = color
+    
             
        
 
@@ -98,6 +94,7 @@ class NormalLayer(AbstractLayer):
             if self.moveable == False :
                 glColor4f(*self.color)
                 drawRectangle((0,0),(self.width,self.height))
+                drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))
             else:
                 glColor4f(self.color[0],self.color[1],self.color[2],self.color[3])
                 drawRectangle((0,0),(self.width,self.height))

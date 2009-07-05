@@ -13,7 +13,7 @@ class Canvas(MTScatterWidget):
         self.layer_clear()
         self.touch_positions = {}
         self.mode = "zoom"
-        set_brush_size(25)
+        self.brush_size = 64
         self.brush_color=(0,0,0,1)
         #self.pixel_holder = (GLfloat * 3072)(0)
 

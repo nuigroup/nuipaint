@@ -15,12 +15,10 @@ class LayerManager(MTScatterWidget):
         self.layer_list = []
         self.brush_color = (0,0,0,1)
         self.brush_sprite = "brushes/brush_particle.png"
-        self.brush_size = 25
+        self.brush_size = 64
         self.background = NormalLayer(size=self.size,color=(1,1,1,1),moveable=False,layer_manager=self)
         self.add_widget(self.background)
 
-
-        
     def set_mode(self,value):
         self.mode = value
         
@@ -68,9 +66,73 @@ class LayerManager(MTScatterWidget):
         layer = NormalLayer(id=len(self.layer_list),pos=pos,size=size,color=color,layer_manager=self)
         self.add_widget(layer)
         self.layer_list.append(layer)
+
+class layerListScroller(MTKineticList):
+    def __init__(self, **kwargs):
+        super(layerListScroller, self).__init__(**kwargs)
+        
+    def draw(self):
+        set_color(*self.style['bg-color'])
+        drawRectangle(self.pos, self.size)  #background
+        super(MTKineticList, self).on_draw()
+        for w in self.widgets:
+            w.on_draw()
+            
+class layerItem(MTButton):
+    def __init__(self, **kwargs):
+        super(layerItem, self).__init__(**kwargs)
+        self.layer_text   = kwargs.get('layer_text')
+        self.label = self.layer_text
+        self.labelWX = MTLabel(label=str(self.layer_text)[:15])#,anchor_x="center",anchor_y="center",halign="center")
+        self.add_widget(self.labelWX)
+        self.size = (180,60)
+        self.layer = kwargs.get('layer_ptr')
+
+    def draw(self):        
+        set_color(*self.style['bg-color'])
+        drawRectangle(self.pos, self.size)
+        self.labelWX.pos = (self.x+70,self.y+25)
+        
+    def on_press(self, touches, touchID, x, y):
+        if touches[touchID].is_double_tap:
+            print  "Show layer options"
+        else:
+            if self.layer.highlight == False :
+                self.layer.highlight = True 
+            else:
+                self.layer.highlight = False 
+        return True
+       
+class layerEntry(layerItem, MTKineticObject):
+    def __init__(self, **kwargs):
+        super(layerEntry, self).__init__(**kwargs)
+        self.layer_text   = kwargs.get('layer_text')
     
+            
+class LayerManagerList(MTRectangularWidget):
+     def __init__(self, **kwargs):
+        super(LayerManagerList, self).__init__(**kwargs)
+        self.size = (200,400)
+        self.layer_list = kwargs.get('layer_list')
+        self.list_layout = layerListScroller(w_limit=1, deletable=False, searchable=False,size=(self.width-20,self.height-20),pos=(self.pos[0]+10,self.pos[1]+10))
+        self.add_widget(self.list_layout)
+        z=1
+        if len(self.layer_list) == 0:
+            entry = layerEntry(layer_text='No Layers')
+            self.list_layout.add_widget(entry)
+        else:
+            for layer in self.layer_list:
+                entry = layerEntry(layer_text=str(z),layer_ptr=layer)
+                self.list_layout.add_widget(entry)
+                z+=1
+        
+     
     
-    
+if __name__ == '__main__':
+    w = MTWindow()
+    ll = LayerManagerList(pos=(w.width-200,w.height-400))
+    w.add_widget(ll)
+    runTouchApp()    
         
 
         

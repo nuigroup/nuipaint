@@ -28,14 +28,19 @@ class AbstractLayer(specialScatterW):
         self.layer_manager = kwargs.get('layer_manager')        
         super(AbstractLayer, self).__init__(**kwargs)
         self.fbo = Fbo(size=(self.width, self.height), with_depthbuffer=False)                
-        self.color = kwargs.get('color')        
+        self.color = (1,1,1,0)
+        self.bgcolor = (1,1,1,1)
         self.layer_clear()
         self.id = kwargs.get('id')
 
     def layer_clear(self):
         with self.fbo:
-            glClearColor(1,1,1,1)
+            if self.moveable == False :
+                glClearColor(1,1,1,1)
+            else:
+                glClearColor(*self.color)
             glClear(GL_COLOR_BUFFER_BIT)
+            glClearColor(1,0,1,1)
             set_color(self.color)
             drawRectangle((0,0),(self.width,self.height))
 
@@ -51,7 +56,7 @@ class AbstractLayer(specialScatterW):
                 with self.fbo:
                     set_color(*self.layer_manager.brush_color)
                     set_brush(self.layer_manager.brush_sprite,self.layer_manager.brush_size)
-                    drawCircle(pos=self.to_local(x,y), radius=1)                
+                    paintLine((x,y,x+1,y+1))                    
             elif self.layer_manager.mode == "zoom":
                 super(AbstractLayer, self).on_touch_down(touches, touchID, x, y)
             return True
@@ -87,15 +92,19 @@ class NormalLayer(AbstractLayer):
             kwargs.setdefault('do_rotation', False)
             kwargs.setdefault('do_translation', False)
         super(NormalLayer, self).__init__(**kwargs)
+        self.highlight =  False        
         
     def draw(self):
         with gx_matrix:
             #glColor4f(*self.color)
             if self.moveable == False :
-                glColor4f(*self.color)
-                drawRectangle((0,0),(self.width,self.height))
-                drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))
+                with gx_blending:
+                    glColor4f(*self.bgcolor)
+                    drawRectangle((0,0),(self.width,self.height))
+                    drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))
             else:
-                glColor4f(self.color[0],self.color[1],self.color[2],self.color[3])
-                drawRectangle((0,0),(self.width,self.height))
-                drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))        
+                with gx_blending:
+                    if self.highlight == True :
+                        glColor4f(0,0,1,0.2)
+                        drawRectangle((0,0),(self.width,self.height))
+                    drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))        

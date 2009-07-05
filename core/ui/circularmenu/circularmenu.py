@@ -1,7 +1,7 @@
 from __future__ import with_statement
 from pymt import *
 from pyglet.gl import *
-from math import cos,sin,radians,pi
+from math import cos,sin,radians,pi,degrees
 from glob import glob
 
 class MTCircularItem(MTButton):
@@ -28,7 +28,7 @@ class MTCircularItem(MTButton):
             return True
         
     def on_press(self, touchID, x, y):
-        self.action_handler(sprite=self.action_value,size=25)
+        self.action_handler(sprite=self.action_value,size=64)
         
     def _get_filename(self):
         return self._filename
@@ -46,17 +46,18 @@ class MTCircularItem(MTButton):
         self.size           = (self.image.width, self.image.height)
         self.image.draw()
 
-class MTCircularMenu_Manager(MTWidget):
+class MTCircularMenu(MTWidget):
     def __init__(self, **kwargs):
-        super(MTCircularMenu_Manager, self).__init__(**kwargs)
+        super(MTCircularMenu, self).__init__(**kwargs)
         self.canvas = kwargs.get('canvas')
         self.pos = kwargs.get('pos')
         self.radius = kwargs.get('radius')
        
         kt = MTKinetic(velstop=5.0)
-        self.circular_menu = MTCircularMenu(pos=self.pos,radius=self.radius)
-        kt.add_widget(self.circular_menu)
-        self.add_widget(kt)
+        self.circular_menu_render = MTCircularMenu_Render(pos=self.pos,radius=self.radius)
+        kt.add_widget(self.circular_menu_render)
+        self.add_widget(kt)        
+        
                 
         brush_list = []
         #by default generate a brushes list in circular menu        
@@ -69,24 +70,24 @@ class MTCircularMenu_Manager(MTWidget):
     def set_list(self,list):
         for item in list:
             im = MTCircularItem(filename=item[0],handler=item[1],value=item[2])
-            self.circular_menu.add_widget(im)
+            self.circular_menu_render.add_widget(im)
 
-class MTCircularMenu(MTScatterWidget):
+class MTCircularMenu_Render(MTScatterWidget):
     def __init__(self, **kwargs):
         kwargs.setdefault('do_scale', False)
         kwargs.setdefault('do_rotation', True)
         kwargs.setdefault('do_translation', False)
-        super(MTCircularMenu, self).__init__(**kwargs)
+        super(MTCircularMenu_Render, self).__init__(**kwargs)
         self.radius = kwargs.get('radius')
         self.size = (self.radius*2,self.radius*2)
         self.pos = kwargs.get('pos')
-        super(MTCircularMenu, self).init_transform(self.pos, 0, 1)
+        super(MTCircularMenu_Render, self).init_transform(self.pos, 0, 1)
         
     def collide_point(self, x, y):
         return Vector(self.pos).distance((x, y)) <= self.radius
         
     def add_widget(self, widget, do_layout=True):
-        super(MTCircularMenu, self).add_widget(widget)
+        super(MTCircularMenu_Render, self).add_widget(widget)
         self.need_layout = True
         if do_layout:
             self.do_layout()

@@ -67,10 +67,11 @@ class MTFileEntry(MTIconObject, MTKineticObject):
         super(MTFileEntry, self).__init__(**kwargs)
         
     def on_press(self, touches, touchID, x, y):
-        if os.path.isdir(self.filename):
-            self.browser.set_path(self.filename)
-        if self.db.visible and self.db.on_touch_down(touches, touchID, x, y):
-            return True
+        if touches[touchID].is_double_tap:
+            if os.path.isdir(self.filename):
+                self.browser.set_path(self.filename)
+            if self.db.visible and self.db.on_touch_down(touches, touchID, x, y):
+                return True
             
 class MTFileBrowser(MTScatterWidget):
     def __init__(self, **kwargs):

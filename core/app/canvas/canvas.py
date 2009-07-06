@@ -15,13 +15,13 @@ class Canvas(MTScatterWidget):
     def draw(self):
         with gx_matrix:
             glColor4f(0,0,0,1)
-            drawRectangle((0,0),(self.width,self.height))
+            drawCSSRectangle((0,0),(self.width,self.height),style=self.style)
             
     def set_mode(self,mode):
         self.layer_manager.set_mode(mode)
 
-    def create_layer(self,pos=(0,0),size=(200,200),color=(0,0,0,0.5)):
-        self.layer_manager.create_layer(pos=pos,size=size,color=color)
+    def create_layer(self,pos=(0,0),size=(200,200)):
+        self.layer_manager.create_layer(pos=pos,size=size)
         
     def save_image(self):
         with self.fbo:
@@ -69,9 +69,9 @@ if __name__ == '__main__':
         canvas.save_image()
     w.add_widget(add_but)
     
-    canvas.create_layer(pos=(100,100),size=(200,200),color=(1,0,0,0.8))
-    canvas.create_layer(size=(300,200),color=(0,1,0,0.8))
-    canvas.create_layer(size=(250,150),color=(0,0,1,0.8))
+    canvas.create_layer(pos=(100,100),size=(200,200))
+    canvas.create_layer(size=(300,200))
+    canvas.create_layer(size=(250,150))
     runTouchApp()
     		
 		

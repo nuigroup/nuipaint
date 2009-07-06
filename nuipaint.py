@@ -4,18 +4,26 @@ from pymt import *
 
 from core import *
 
+additional_css = '''
+.roundedBorder {
+    border-radius: 20;
+    border-radius-precision: .1;
+}
+
+'''
+css_add_sheet(additional_css)
 
 if __name__ == '__main__':
     w = MTWindow()
     #Canvas
-    cv = Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120))
+    cv = Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'))
     w.add_widget(cv) 
     
     cv.create_layer(pos=(100,100),size=(200,200))
     cv.create_layer(size=(300,200))
     cv.create_layer(size=(250,150))
     
-    lm = LayerManagerList(pos=(w.width-200,w.height-400),layer_list=cv.getList())
+    lm = LayerManagerList(pos=(w.width-200,w.height-300),layer_list=cv.getList(),cls=('roundedBorder'))
     w.add_widget(lm)
     
     #File Browser

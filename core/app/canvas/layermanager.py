@@ -61,9 +61,11 @@ class LayerManager(MTScatterWidget):
             for layer in self.layer_list:
                 self.add_widget(layer) 
         
-        
-    def create_layer(self,pos=(0,0),size=(200,200),color=(0,0,0,0.5)):
-        layer = NormalLayer(id=len(self.layer_list),pos=pos,size=size,color=color,layer_manager=self)
+    def getLayerList(self):
+        return self.layer_list
+    
+    def create_layer(self,pos=(0,0),size=(200,200)):
+        layer = NormalLayer(id=len(self.layer_list),pos=pos,size=size,layer_manager=self)
         self.add_widget(layer)
         self.layer_list.append(layer)
 
@@ -81,53 +83,116 @@ class layerListScroller(MTKineticList):
 class layerItem(MTButton):
     def __init__(self, **kwargs):
         super(layerItem, self).__init__(**kwargs)
+        kwargs.setdefault('color', self.style['bg-color'])
+        self.id = kwargs.get('id')
         self.layer_text   = kwargs.get('layer_text')
         self.label = self.layer_text
         self.labelWX = MTLabel(label=str(self.layer_text)[:15])#,anchor_x="center",anchor_y="center",halign="center")
         self.add_widget(self.labelWX)
         self.size = (180,60)
         self.layer = kwargs.get('layer_ptr')
+        self.color = kwargs.get('color') 
+        self.layer_list = kwargs.get('layer_list')
 
     def draw(self):        
-        set_color(*self.style['bg-color'])
+        set_color(*self.color)
         drawRectangle(self.pos, self.size)
-        self.labelWX.pos = (self.x+70,self.y+25)
+        self.labelWX.pos = (self.x+60,self.y+25)
         
     def on_press(self, touches, touchID, x, y):
         if touches[touchID].is_double_tap:
             print  "Show layer options"
         else:
             if self.layer.highlight == False :
-                self.layer.highlight = True 
+                self.layer.highlight = True
+                self.color = (1.0,0.4,0)
+                self.layer_list.selected_layers.append(self.id)
             else:
                 self.layer.highlight = False 
+                self.color = self.style['bg-color']
+                self.layer_list.selected_layers.remove(self.id)
         return True
        
 class layerEntry(layerItem, MTKineticObject):
     def __init__(self, **kwargs):
         super(layerEntry, self).__init__(**kwargs)
         self.layer_text   = kwargs.get('layer_text')
-    
-            
+
+#Class Definations for the buttons inside layerlist        
+additional_css = '''
+.simple {
+	draw-alpha-background: 1;
+	draw-border: 1;
+	draw-slider-alpha-background: 1;
+	draw-slider-border: 1;
+	draw-text-shadow: 1;
+}
+
+.colored {
+	bg-color: #ff5c00;
+	border-radius: 20;
+	border-radius-precision: .1;
+	font-size: 10;
+	slider-border-radius-precision: .1;
+	slider-border-radius: 20;
+}
+
+'''  
+css_add_sheet(additional_css)
+
 class LayerManagerList(MTRectangularWidget):
-     def __init__(self, **kwargs):
+    def __init__(self, **kwargs):
         super(LayerManagerList, self).__init__(**kwargs)
-        self.size = (200,400)
+        self.size = (200,300)
         self.layer_list = kwargs.get('layer_list')
-        self.list_layout = layerListScroller(w_limit=1, deletable=False, searchable=False,size=(self.width-20,self.height-20),pos=(self.pos[0]+10,self.pos[1]+10))
+        self.list_layout = layerListScroller(w_limit=1, deletable=False, searchable=False,size=(self.width-20,self.height-60),pos=(self.pos[0]+10,self.pos[1]+50))
+        self.list_items = []
+        self.selected_layers = []
         self.add_widget(self.list_layout)
         z=1
         if len(self.layer_list) == 0:
             entry = layerEntry(layer_text='No Layers')
-            self.list_layout.add_widget(entry)
+            self.list_layout.add(entry)
         else:
             for layer in self.layer_list:
-                entry = layerEntry(layer_text=str(z),layer_ptr=layer)
-                self.list_layout.add_widget(entry)
+                entry = layerEntry(id=z,layer_text="Layer "+str(z),layer_ptr=layer,layer_list=self)
+                self.list_layout.add(entry)
+                self.list_items.append(entry)
                 z+=1
+        self.layer_manager = self.layer_list[0].getLayerManager()
         
-     
-    
+        create = MTButton(label="New",pos=(self.pos[0]+10,self.pos[1]+10),size=(50,30),cls=('simple', 'colored'))
+        self.add_widget(create)
+        
+        @create.event    
+        def on_press(touchID, x, y):
+            self.layer_manager.create_layer(pos=(0,0),size=(200,200))
+            self.updateLayerList()
+        
+        delete = MTButton(label="Delete",pos=(self.pos[0]+70,self.pos[1]+10),size=(55,30),cls=('simple', 'colored'))
+        self.add_widget(delete)
+        
+        resize = MTButton(label="Resize",pos=(self.pos[0]+135,self.pos[1]+10),size=(55,30),cls=('simple', 'colored'))
+        self.add_widget(resize)
+        
+    def updateLayerList(self):
+        for item in self.list_items:
+            self.list_layout.delete_item(item)
+            
+        self.list_items = []
+        
+        self.layer_list = self.layer_manager.getLayerList()
+        z=1
+        for layer in self.layer_list:
+            if z in self.selected_layers:
+                entry = layerEntry(id=z,layer_text="Layer "+str(z),layer_ptr=layer,layer_list=self,color=(1.0,0.4,0))
+            else:
+                entry = layerEntry(id=z,layer_text="Layer "+str(z),layer_ptr=layer,layer_list=self)
+            self.list_layout.add(entry)
+            self.list_items.append(entry)
+            z += 1
+       
+        
 if __name__ == '__main__':
     w = MTWindow()
     ll = LayerManagerList(pos=(w.width-200,w.height-400))

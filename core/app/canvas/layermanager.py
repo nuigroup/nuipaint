@@ -18,6 +18,7 @@ class LayerManager(MTScatterWidget):
         self.brush_size = 64
         self.background = NormalLayer(size=self.size,color=(1,1,1,1),moveable=False,layer_manager=self)
         self.add_widget(self.background)
+        self.layer_counter = 0
 
     def set_mode(self,value):
         self.mode = value
@@ -65,9 +66,22 @@ class LayerManager(MTScatterWidget):
         return self.layer_list
     
     def create_layer(self,pos=(0,0),size=(200,200)):
-        layer = NormalLayer(id=len(self.layer_list),pos=pos,size=size,layer_manager=self)
+        layer = NormalLayer(id=self.layer_counter,pos=pos,size=size,layer_manager=self)
         self.add_widget(layer)
+        self.layer_counter += 1
         self.layer_list.append(layer)
+        
+    def delete_layer(self,selected_layers):
+        list = self.layer_list
+        del_list = []
+        for layer in list:
+            if layer.id in selected_layers:
+                del_list.append(layer)
+                
+        for ele in del_list:
+            self.layer_list.remove(ele)
+            self.remove_widget(ele)
+        del_list = []
 
 class layerListScroller(MTKineticList):
     def __init__(self, **kwargs):
@@ -144,33 +158,47 @@ class LayerManagerList(MTRectangularWidget):
     def __init__(self, **kwargs):
         super(LayerManagerList, self).__init__(**kwargs)
         self.size = (200,300)
-        self.layer_list = kwargs.get('layer_list')
         self.list_layout = layerListScroller(w_limit=1, deletable=False, searchable=False,size=(self.width-20,self.height-60),pos=(self.pos[0]+10,self.pos[1]+50))
         self.list_items = []
         self.selected_layers = []
         self.add_widget(self.list_layout)
-        z=1
+        self.layer_manager = kwargs.get('layer_manager')
+        self.layer_list = self.layer_manager.layer_list
+
         if len(self.layer_list) == 0:
             entry = layerEntry(layer_text='No Layers')
             self.list_layout.add(entry)
+            self.list_items.append(entry)
         else:
             for layer in self.layer_list:
-                entry = layerEntry(id=z,layer_text="Layer "+str(z),layer_ptr=layer,layer_list=self)
+                entry = layerEntry(id=layer.id,layer_text="Layer "+str(layer.id),layer_ptr=layer,layer_list=self)
                 self.list_layout.add(entry)
                 self.list_items.append(entry)
-                z+=1
-        self.layer_manager = self.layer_list[0].getLayerManager()
+        
         
         create = MTButton(label="New",pos=(self.pos[0]+10,self.pos[1]+10),size=(50,30),cls=('simple', 'colored'))
         self.add_widget(create)
         
         @create.event    
         def on_press(touchID, x, y):
+            if self.list_layout.pchildren[0].label == 'No Layers':
+                for item in self.list_items:
+                    self.list_layout.delete_item(item)
+                    self.list_items.remove(item)
             self.layer_manager.create_layer(pos=(0,0),size=(200,200))
             self.updateLayerList()
         
         delete = MTButton(label="Delete",pos=(self.pos[0]+70,self.pos[1]+10),size=(55,30),cls=('simple', 'colored'))
         self.add_widget(delete)
+        
+        @delete.event    
+        def on_press(touchID, x, y):
+            self.layer_manager.delete_layer(self.selected_layers)
+            self.updateLayerList()
+            if len(self.list_layout.pchildren) == 0 :
+                entry = layerEntry(layer_text='No Layers')
+                self.list_layout.add(entry)
+                self.list_items.append(entry)
         
         resize = MTButton(label="Resize",pos=(self.pos[0]+135,self.pos[1]+10),size=(55,30),cls=('simple', 'colored'))
         self.add_widget(resize)
@@ -182,15 +210,14 @@ class LayerManagerList(MTRectangularWidget):
         self.list_items = []
         
         self.layer_list = self.layer_manager.getLayerList()
-        z=1
+
         for layer in self.layer_list:
-            if z in self.selected_layers:
-                entry = layerEntry(id=z,layer_text="Layer "+str(z),layer_ptr=layer,layer_list=self,color=(1.0,0.4,0))
+            if layer.id in self.selected_layers:
+                entry = layerEntry(id=layer.id,layer_text="Layer "+str(layer.id),layer_ptr=layer,layer_list=self,color=(1.0,0.4,0))
             else:
-                entry = layerEntry(id=z,layer_text="Layer "+str(z),layer_ptr=layer,layer_list=self)
+                entry = layerEntry(id=layer.id,layer_text="Layer "+str(layer.id),layer_ptr=layer,layer_list=self)
             self.list_layout.add(entry)
             self.list_items.append(entry)
-            z += 1
        
         
 if __name__ == '__main__':

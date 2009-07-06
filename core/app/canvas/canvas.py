@@ -44,9 +44,9 @@ class Canvas(MTScatterWidget):
             return True
         else:
             return False
-    
-    def getList(self):
-        return self.layer_manager.layer_list
+        
+    def getListManager(self):
+        return self.layer_manager
 		
 if __name__ == '__main__':
     w = MTWindow()

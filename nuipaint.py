@@ -19,11 +19,11 @@ if __name__ == '__main__':
     cv = Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'))
     w.add_widget(cv) 
     
-    cv.create_layer(pos=(100,100),size=(200,200))
-    cv.create_layer(size=(300,200))
-    cv.create_layer(size=(250,150))
+    #cv.create_layer(pos=(100,100),size=(200,200))
+    #cv.create_layer(size=(300,200))
+    #cv.create_layer(size=(250,150))
     
-    lm = LayerManagerList(pos=(w.width-200,w.height-300),layer_list=cv.getList(),cls=('roundedBorder'))
+    lm = LayerManagerList(pos=(w.width-200,w.height-300),layer_manager=cv.getListManager(),cls=('roundedBorder'))
     w.add_widget(lm)
     
     #File Browser

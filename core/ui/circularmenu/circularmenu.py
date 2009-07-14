@@ -81,7 +81,7 @@ class MTCircularMenu_Render(MTScatterWidget):
         self.radius = kwargs.get('radius')
         self.size = (self.radius*2,self.radius*2)
         self.pos = kwargs.get('pos')
-        super(MTCircularMenu_Render, self).init_transform(self.pos, 0, 1)
+        #super(MTCircularMenu_Render, self).init_transform(self.pos, 0, 1)
         
     def collide_point(self, x, y):
         return Vector(self.pos).distance((x, y)) <= self.radius
@@ -95,8 +95,8 @@ class MTCircularMenu_Render(MTScatterWidget):
     def do_layout(self):
         x = int((self.radius-40)*cos(radians(20*(len(self.children)-1))))
         y = int((self.radius-40)*sin(radians(20*(len(self.children)-1))))
-        self.children[len(self.children)-1].x = x
-        self.children[len(self.children)-1].y = y
+        self.children[len(self.children)-1].x = x+self.radius
+        self.children[len(self.children)-1].y = y+self.radius
                 
     def rotate_zoom_move(self, touchID, x, y):
         # we definitly have one point
@@ -128,7 +128,7 @@ class MTCircularMenu_Render(MTScatterWidget):
         #drawCircle((0,0), 10)
         set_color(*self.style.get('bg-color'))
         #drawRectangle((0,0),self.size)
-        drawCircle((0,0), self.radius)
+        drawCircle((self.pos[0]+self.radius,self.pos[1]+self.radius), self.radius)
         #drawCircle(self.pos, self.radius-64)
         #drawTriangle(self.pos, w=40, h=100)
             

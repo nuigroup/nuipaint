@@ -107,3 +107,24 @@ class NormalLayer(AbstractLayer):
                 if self.highlight == True :
                     glColor4f(0,0,1,0.2)
                     drawRectangle((0,0),(self.width,self.height))                    
+
+class ImageLayer(AbstractLayer):
+    def __init__(self, **kwargs):
+        kwargs.setdefault('layer_manager', None)
+        self.moveable = kwargs.get('moveable')
+        if self.moveable == False :
+            kwargs.setdefault('do_scale', False)
+            kwargs.setdefault('do_rotation', False)
+            kwargs.setdefault('do_translation', False)
+        super(ImageLayer, self).__init__(**kwargs)
+        self.highlight =  False 
+        self.background = "images/photo3.jpg"
+        img = pyglet.image.load(self.background)
+        self.image  = pyglet.sprite.Sprite(img)
+  
+        
+    def draw(self):
+        with gx_matrix:
+                self.image.draw()
+                drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))
+ 

@@ -12,8 +12,6 @@ class KineticBrowseLayout(MTKineticList):
         set_color(*self.style['bg-color'])
         drawRectangle(self.pos, self.size)  #background
         super(MTKineticList, self).on_draw()
-        #drawRectangle((self.x, self.height + self.y - 40), (self.width, 40))  #Title Bar
-        #self.title.draw()
         for w in self.widgets:
             w.on_draw()
             
@@ -58,6 +56,9 @@ class MTIconObject(MTButton):
         self.image.scale    = self.scale
         self.image.draw()
         self.labelWX.pos = (int(self.x+20),int(self.y-5))
+        
+    def on_press(self, touches, touchID, x, y):
+        pass
 
             
 class MTFileEntry(MTIconObject, MTKineticObject):
@@ -70,14 +71,13 @@ class MTFileEntry(MTIconObject, MTKineticObject):
         if touches[touchID].is_double_tap:
             if os.path.isdir(self.filename):
                 self.browser.set_path(self.filename)
-            if self.db.visible and self.db.on_touch_down(touches, touchID, x, y):
-                return True
+            else:
+                print "icon"
+            #if self.db.visible and self.db.on_touch_down(touches, touchID, x, y):
+            #    return True
             
 class MTFileBrowser(MTScatterWidget):
     def __init__(self, **kwargs):
-        #kwargs.setdefault('do_scale', False)
-        #kwargs.setdefault('do_rotation', False)
-        #kwargs.setdefault('do_translation', True)
         super(MTFileBrowser, self).__init__(**kwargs)
         self.kb = KineticBrowseLayout(w_limit=4, deletable=False, searchable=False,size=(self.width-20,self.height-20))
         self.add_widget(self.kb,"front")
@@ -111,7 +111,6 @@ class MTFileBrowser(MTScatterWidget):
         if not self.dl.is_compiled():
             with DO(self.dl):
                 self.update_listing()
-                #drawRoundedRectangle(size=(self.width,self.height), radius=10) 
         self.dl.draw()
         super(MTFileBrowser, self).on_draw()
 

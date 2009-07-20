@@ -6,9 +6,15 @@ from layermanager import *
 class Canvas(MTScatterWidget):
     def __init__(self, **kwargs):
         super(Canvas, self).__init__(**kwargs)
+        if kwargs.get('background'):
+            self.back_image = pyglet.image.load(kwargs.get('background'))
+            self.size = (self.back_image.width,self.back_image.height)
         self.canvas_area = MTStencilContainer(pos=(20,20),size=(self.width-40,self.height-40))
         self.add_widget(self.canvas_area)
-        self.layer_manager = LayerManager(pos=(20,20),canvas=self,size=(self.width-40,self.height-40))
+        if kwargs.get('background'):
+            self.layer_manager = LayerManager(pos=(20,20),canvas=self,size=(self.width-40,self.height-40),background=kwargs.get('background'))
+        else:
+            self.layer_manager = LayerManager(pos=(20,20),canvas=self,size=(self.width-40,self.height-40))
         self.canvas_area.add_widget(self.layer_manager)
         self.fbo = Fbo(size=(self.width, self.height), with_depthbuffer=False)
 		

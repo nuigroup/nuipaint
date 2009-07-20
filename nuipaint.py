@@ -16,7 +16,7 @@ css_add_sheet(additional_css)
 if __name__ == '__main__':
     w = MTWindow()
     #Canvas
-    cv = Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'))
+    cv = Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'),background="images/photo3.jpg")#Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'))
     w.add_widget(cv) 
     
     #cv.create_layer(pos=(100,100),size=(200,200))
@@ -44,6 +44,9 @@ if __name__ == '__main__':
       
     cs = MTColorSelector(pos=(w.width-200,0),size=(200,200),win=w,canvas=cv)
     w.add_widget(cs)
+    
+    #cv2 = Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'),background="images/photo3.jpg")
+    #w.add_widget(cv2)
    
     runTouchApp()
   

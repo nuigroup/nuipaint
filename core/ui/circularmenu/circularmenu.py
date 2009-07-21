@@ -98,10 +98,10 @@ class MTCircularMenu_Render(MTScatterWidget):
         self.children[len(self.children)-1].x = x+self.radius
         self.children[len(self.children)-1].y = y+self.radius
                 
-    def rotate_zoom_move(self, touch):
+    def rotate_zoom_move(self, touchid, x, y):
         # we definitly have one point
-        p1_start = Vector(*self.touches[touch.id])
-        p1_now   = Vector(touch.x, touch.y)
+        p1_start = Vector(*self.touches[touchid])
+        p1_now   = Vector(x, y)
 
         # if we have a second point, do the scale/rotate/move thing
         # find intersection between lines...the point around which to rotate
@@ -121,7 +121,7 @@ class MTCircularMenu_Render(MTScatterWidget):
         self.apply_angle_scale_trans(rotation, scale, trans, intersect)
 
         # save new position of the current touch
-        self.touches[touchID] = Vector(touch.x,touch.y)
+        self.touches[touchid] = Vector(x,y)
         
     def draw(self):
         #set_color(0,1,0,1)

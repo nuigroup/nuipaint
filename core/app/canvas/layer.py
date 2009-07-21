@@ -7,22 +7,25 @@ class specialScatterW(MTScatterWidget):
         super(specialScatterW, self).__init__(**kwargs)
     
     def on_touch_down(self, touch):
+        x, y = touch.x, touch.y
+
         # if the touch isnt on the widget we do nothing
-        if not self.collide_point(touch.x,touch.y):
+        if not self.collide_point(x, y):
             return False
 
         # let the child widgets handle the event if they want
-        prevx,prevy = touch.x,touch.y
-        lx, ly = self.to_local(touch.x,touch.y)
-        touch.x,touch.y = lx,ly
+        touch.push()
+        touch.x, touch.y = self.to_local(x, y)
         if super(MTScatterWidget, self).on_touch_down(touch):
+            touch.pop()
             return True
+        touch.pop()
 
         # if the children didnt handle it, we bring to front & keep track
         # of touches for rotate/scale/zoom action
+        touch.grab(self)
         #self.bring_to_front()
-        touch.x,touch.y = prevx,prevy
-        self.touches[touch.id] = Vector(touch.x,touch.y)
+        self.touches[touch.id] = Vector(x, y)
         return True
         
 class AbstractLayer(specialScatterW):
@@ -50,23 +53,25 @@ class AbstractLayer(specialScatterW):
     def on_touch_down(self, touch):
         if self.collide_point(touch.x,touch.y): 
             #prevx,prevy = touch.x,touch.y
+            touches = getAvailableTouchs()
             self.touches[touch.id] = self.to_local(touch.x,touch.y)
             if len(touches)==2 :                
-                if touches[touch.id].is_double_tap:
+                if touch.is_double_tap:
                     self.layer_manager.move_layer_down(self.id)
-            elif touches[touch.id].is_double_tap:
+            elif touch.is_double_tap:
                self.layer_manager.move_layer_up(self.id)
             if self.layer_manager.mode == "draw":
                 with self.fbo:
                     set_color(*self.layer_manager.brush_color)
                     set_brush(self.layer_manager.brush_sprite,self.layer_manager.brush_size)
-                    paintLine((x,y,x+1,y+1))                    
+                    paintLine((touch.x,touch.y,touch.x+1,touch.y+1))                    
             elif self.layer_manager.mode == "zoom":
+                print "here"
                 super(AbstractLayer, self).on_touch_down(touch)
             return True
             
     def on_touch_move(self, touch):
-        if touch.id in self.touches:
+        if self.collide_point(touch.x,touch.y): 
             if self.layer_manager.mode == "zoom":
                 super(AbstractLayer, self).on_touch_move(touch)
             elif self.layer_manager.mode == "draw":
@@ -80,7 +85,7 @@ class AbstractLayer(specialScatterW):
             return True
             
     def on_touch_up(self, touch):
-        if touch.id in self.touches:
+        if self.collide_point(touch.x,touch.y): 
             del self.touches[touch.id]
             return True
             

@@ -117,7 +117,8 @@ class layerItem(MTButton):
         self.labelWX.pos = (self.x+60,self.y+25)
         
     def on_press(self, touch) :
-        if touches[touch.id].is_double_tap:
+        touches = getAvailableTouchs()
+        if touch.is_double_tap:
             print  "Show layer options"
         else:
             if self.layer.highlight == False :

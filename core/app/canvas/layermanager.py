@@ -116,8 +116,8 @@ class layerItem(MTButton):
         drawRectangle(self.pos, self.size)
         self.labelWX.pos = (self.x+60,self.y+25)
         
-    def on_press(self, touches, touchID, x, y):
-        if touches[touchID].is_double_tap:
+    def on_press(self, touch) :
+        if touches[touch.id].is_double_tap:
             print  "Show layer options"
         else:
             if self.layer.highlight == False :
@@ -183,7 +183,7 @@ class LayerManagerList(MTRectangularWidget):
         self.add_widget(create)
         
         @create.event    
-        def on_press(touchID, x, y):
+        def on_press(touch):
             if self.list_layout.pchildren[0].label == 'No Layers':
                 for item in self.list_items:
                     self.list_layout.delete_item(item)
@@ -195,7 +195,7 @@ class LayerManagerList(MTRectangularWidget):
         self.add_widget(delete)
         
         @delete.event    
-        def on_press(touchID, x, y):
+        def on_press(touch):
             self.layer_manager.delete_layer(self.selected_layers)
             self.updateLayerList()
             if len(self.list_layout.pchildren) == 0 :

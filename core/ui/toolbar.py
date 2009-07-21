@@ -52,15 +52,15 @@ class toolbar(MTWidget):
         self.add_widget(tb)
         
         @zoom_icon.event
-        def on_press(touchID, x, y):
+        def on_press(touch):
             self.canvas.set_mode("zoom")
             
         @brush_icon.event
-        def on_press(touchID, x, y):
+        def on_press(touch):
             self.canvas.set_mode("draw")
             
         @filter_icon.event
-        def on_press(touchID, x, y):
+        def on_press(touch):
             self.canvas.set_mode("smudge")   
          
         

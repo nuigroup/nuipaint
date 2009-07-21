@@ -57,7 +57,7 @@ class MTIconObject(MTButton):
         self.image.draw()
         self.labelWX.pos = (int(self.x+20),int(self.y-5))
         
-    def on_press(self, touches, touchID, x, y):
+    def on_press(self,touch):
         pass
 
             
@@ -67,8 +67,8 @@ class MTFileEntry(MTIconObject, MTKineticObject):
         self.browser    = kwargs.get('browser')
         super(MTFileEntry, self).__init__(**kwargs)
         
-    def on_press(self, touches, touchID, x, y):
-        if touches[touchID].is_double_tap:
+    def on_press(self, touch):
+        if touches[touch.id].is_double_tap:
             if os.path.isdir(self.filename):
                 self.browser.set_path(self.filename)
             else:
@@ -88,7 +88,7 @@ class MTFileBrowser(MTScatterWidget):
         self.close_button.pos = (self.width-self.close_button.width,self.height-self.close_button.height)
         self.add_widget(self.close_button,"front")
         @self.close_button.event
-        def on_press(touchID, x, y):
+        def on_press(touch):
             self.hide()
   
     def update_listing(self):

@@ -46,21 +46,21 @@ class MTCircularSlider(MTWidget):
     def on_value_change(self, value):
         pass
 
-    def on_touch_down(self, touches, touchID, x, y):
-        if self.collide_point(x, y):
-            self.touchstarts.append(touchID)
-            self.last_touch = (x - self.pos[0], y - self.pos[1])
+    def on_touch_down(self, touch):
+        if self.collide_point(touch.x, touch.y):
+            self.touchstarts.append(touch.id)
+            self.last_touch = (touch.x - self.pos[0], touch.y - self.pos[1])
             self._value = (self.slider_fill_angle) * (self.max - self.min) / self.sweep_angle + self.min 
             self.calculate_angle()
             return True
     
-    def on_touch_up(self, touches, touchID, x, y):
-        if touchID in self.touchstarts:
-            self.touchstarts.remove(touchID)            
+    def on_touch_up(self, touch):
+        if touch.id in self.touchstarts:
+            self.touchstarts.remove(touch.id)            
             
-    def on_touch_move(self, touches, touchID, x, y):
-        if self.collide_point(x, y) and touchID in self.touchstarts:
-            self.last_touch = (x - self.pos[0], y - self.pos[1])
+    def on_touch_move(self, touch):
+        if self.collide_point(touch.x, touch.y) and touch.id in self.touchstarts:
+            self.last_touch = (touch.x - self.pos[0], touch.y - self.pos[1])
             self._value = (self.slider_fill_angle) * (self.max - self.min) / self.sweep_angle + self.min 
             self.calculate_angle()
             return True

@@ -61,17 +61,17 @@ if __name__ == '__main__':
     draw_but = MTButton(label="Painting")
     w.add_widget(draw_but)
     @draw_but.event    
-    def on_press(touchID, x, y):
+    def on_press(touch) :
         canvas.set_mode(mode='draw')
     zoom_but = MTButton(label="Layering",pos=(draw_but.width+5,0))
     w.add_widget(zoom_but)
     @zoom_but.event    
-    def on_press(touchID, x, y):
+    def on_press(touch) :
         canvas.set_mode(mode='zoom')
     
     add_but = MTButton(label="Save",pos=(draw_but.width+zoom_but.width+10,0))
     @add_but.event    
-    def on_press(touchID, x, y):
+    def on_press(touch) :
         canvas.save_image()
     w.add_widget(add_but)
     

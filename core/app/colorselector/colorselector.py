@@ -77,23 +77,23 @@ class MTColorCircle(MTWidget):
             glTranslated(self.pos[0]+self.size[0], self.pos[1], 0)            
             drawPartialCircle(pos=self.pos,radius=200) #Draw Color Wheel
         
-    def on_touch_down(self, touches, touchID, x, y):
-        if self.collide_point(x,y):
-            self.touchstarts.append(touchID)
-            self.point_angle = Vector((0,self.height)).angle((self.parent_win.width-x,y))
-            self.point_distance = Vector((self.pos[0]+self.width,0)).distance((x, y))
+    def on_touch_down(self, touch):
+        if self.collide_point(touch.x,touch.y):
+            self.touchstarts.append(touch.id)
+            self.point_angle = Vector((0,self.height)).angle((self.parent_win.width-touch.x,touch.y))
+            self.point_distance = Vector((self.pos[0]+self.width,0)).distance((touch.x, touch.y))
             self.calculate_color()
             return True
             
-    def on_touch_move(self, touches, touchID, x, y):
-        if self.collide_point(x, y) and touchID in self.touchstarts:
-            self.point_angle = Vector((0,self.height)).angle((self.parent_win.width-x,y))
-            self.point_distance = Vector((self.pos[0]+self.width,0)).distance((x, y))
+    def on_touch_move(self, touch):
+        if self.collide_point(touch.x, touch.y) and touch.id in self.touchstarts:
+            self.point_angle = Vector((0,self.height)).angle((self.parent_win.width-touch.x,touch.y))
+            self.point_distance = Vector((self.pos[0]+self.width,0)).distance((touch.x, touch.y))
             self.calculate_color()
             
-    def on_touch_up(self, touches, touchID, x, y):
-        if touchID in self.touchstarts:
-            self.touchstarts.remove(touchID) 
+    def on_touch_up(self, touch):
+        if touch.id in self.touchstarts:
+            self.touchstarts.remove(touch.id) 
             
     def calculate_color(self):
         b = 1-self.point_distance/self.size[0]

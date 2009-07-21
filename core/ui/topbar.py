@@ -25,5 +25,5 @@ class topBar(MTWidget):
         tb.size = (tb._get_content_width()-45,tb.height)
         
         @open_icon.event
-        def on_press(touchID, x, y):
+        def on_press(touch):
             self.filebrowser.show()        

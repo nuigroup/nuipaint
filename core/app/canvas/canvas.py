@@ -53,6 +53,16 @@ class Canvas(MTScatterWidget):
         
     def getListManager(self):
         return self.layer_manager
+        
+    def disableTransformations(self):
+        self.do_scale       = False
+        self.do_rotation    = False
+        self.do_translation = False
+    
+    def enableTransformations(self):
+        self.do_scale       = True
+        self.do_rotation    = True
+        self.do_translation = True
 		
 if __name__ == '__main__':
     w = MTWindow()

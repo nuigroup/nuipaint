@@ -43,6 +43,8 @@ class windowing(MTScatterWidget):
         super(windowing, self).add_widget(self.container)
         self.control_scale = 0.75
         self.setup_controls()
+        self.register_event_type('on_fullscreen')
+        self.register_event_type('on_unfullscreen')
 
     def setup_controls(self):
         self.controls = MTWidget()
@@ -58,6 +60,7 @@ class windowing(MTScatterWidget):
         self.update_controls()
 
     def fullscreen(self, *largs, **kwargs):
+        self.dispatch_event('on_fullscreen')
         root_win = self.parent.get_parent_window()
 
         # save state for restore
@@ -87,6 +90,7 @@ class windowing(MTScatterWidget):
         # set old size
         self.size = self.old_size
         self.container.size = self.size
+        self.dispatch_event('on_unfullscreen')
 
     def close(self, touch):
         self.parent.remove_widget(self)

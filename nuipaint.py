@@ -19,7 +19,8 @@ class FullScreenPaint(MTWidget):
         super(FullScreenPaint,self).__init__(**kwargs)
         #Canvas
         w = kwargs.get('window')
-        self.canvas = Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'))#Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'),background="images/photo3.jpg")
+        #self.canvas = Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'))#Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'),background="images/photo3.jpg")
+        self.canvas = kwargs.get('canvas')
         self.add_widget(self.canvas) 
         
         #cv.create_layer(pos=(100,100),size=(200,200))
@@ -57,7 +58,7 @@ class FullScreenPaint(MTWidget):
 class WindowedPaint(MTWidget):
     def __init__(self, **kwargs):
         super(WindowedPaint, self).__init__(**kwargs)        
-        self.canvas = Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'))
+        self.canvas = kwargs.get('canvas')
         self.add_widget(self.canvas)
         #Bottom Toolbar
         tb = toolbar(win=w,canvas=self.canvas)
@@ -71,23 +72,32 @@ class WindowedPaint(MTWidget):
 class NUIPaint(windowing):
     def __init__(self, **kwargs):
         super(NUIPaint, self).__init__(**kwargs)
-        w = self.get_parent_window()
+        self.win = kwargs.get('window')
         
-        self.canvas = Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'))#Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'),background="images/photo3.jpg")
+        self.canvas = Canvas(size=(540,440),pos=(self.win.width/2-260,self.win.height/2-120),cls=('roundedBorder'))#Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'),background="images/photo3.jpg")
         
-        full_mode_painter = kwargs.get('full_mode')
-        full_mode_painter.set_canvas(self.canvas)
+        self.full_mode_painter = FullScreenPaint(window=self.win,canvas=self.canvas)      
         
-        windowed_mode_painter = kwargs.get('win_mode')
-        windowed_mode_painter.set_canvas(self.canvas)
+        self.windowed_mode_painter = WindowedPaint(window=self.win,canvas=self.canvas)
+        self.add_widget(self.windowed_mode_painter)
+        self.on_unfullscreen()
+        
+    def on_fullscreen(self):
+        self.add_widget(self.full_mode_painter)
+        self.canvas.enableTransformations()
+        self.canvas.init_transform((self.win.width/2-self.canvas.width/2,self.win.height/2-self.canvas.height/2), 0, 1)
+        self.remove_widget(self.windowed_mode_painter)
+            
+    def on_unfullscreen(self):
+        self.add_widget(self.windowed_mode_painter)
+        self.canvas.disableTransformations()
+        self.canvas.init_transform((0,0), 0, 1)
+        self.remove_widget(self.full_mode_painter)
     
 if __name__ == '__main__':
     w = MTWindow()
-    #temporary instantiated object
-    full = FullScreenPaint(window=w)
-    windowed = WindowedPaint(window=w)
     
-    in_win = NUIPaint(full_mode = full, win_mode = windowed,size=(540,440),style={'bg-color':(1,1,1),'bg-color-move':(1,0,0),'bg-color-full':(0,0,1),'border-width':20})
+    in_win = NUIPaint(window = w,size=(540,440),style={'bg-color':(1,1,1),'bg-color-move':(1,0,0),'bg-color-full':(0,0,1),'border-width':20})
     w.add_widget(in_win)
 
     runTouchApp()

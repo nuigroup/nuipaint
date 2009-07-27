@@ -75,7 +75,7 @@ class AbstractLayer(specialScatterW):
                 super(AbstractLayer, self).on_touch_move(touch)
             elif self.layer_manager.mode == "draw":
                 cur_pos = self.to_local(touch.x,touch.y)
-                ox,oy = touch.x,touch.y
+                ox,oy = self.to_local(touch.x,touch.y)
                 with self.fbo:
                     set_color(*self.layer_manager.brush_color)
                     set_brush(self.layer_manager.brush_sprite,self.layer_manager.brush_size)

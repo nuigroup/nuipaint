@@ -17,6 +17,7 @@ class Canvas(MTScatterWidget):
             self.layer_manager = LayerManager(pos=(20,20),canvas=self,size=(self.width-40,self.height-40))
         self.canvas_area.add_widget(self.layer_manager)
         self.fbo = Fbo(size=(self.width, self.height), with_depthbuffer=False)
+
 		
     def draw(self):
         with gx_matrix:

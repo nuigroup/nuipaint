@@ -53,7 +53,7 @@ class windowing(MTScatterWidget):
         self.btn_fullscreen.push_handlers(on_release=self.fullscreen)
         self.controls.add_widget(self.btn_fullscreen)
 
-        self.btn_close = MTImageButton(filename=iconPath+'filesave.png', scale=self.control_scale, cls='innerwindow-close')
+        self.btn_close = MTImageButton(filename=iconPath+'close.png', scale=self.control_scale, cls='innerwindow-close')
         self.btn_close.push_handlers(on_release=self.close)
         self.controls.add_widget(self.btn_close)
 
@@ -72,10 +72,9 @@ class windowing(MTScatterWidget):
         root_win.add_widget(root_win.sim)
         root_win.add_widget(self.container)
 
-        btn_unfullscreen = MTButton(pos=(root_win.width-50, root_win.height-50),
-                                    size=(50,50), label='Back')
-        btn_unfullscreen.push_handlers(on_release=self.unfullscreen)
-        root_win.add_widget(btn_unfullscreen)
+        #btn_unfullscreen = MTButton(pos=(root_win.width-50, root_win.height-50),size=(50,50), label='Back')
+        #btn_unfullscreen.push_handlers(on_release=self.unfullscreen)
+        #root_win.add_widget(btn_unfullscreen)
         self.size = root_win.size
         self.container.size = self.size
 

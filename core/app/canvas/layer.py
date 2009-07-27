@@ -66,7 +66,6 @@ class AbstractLayer(specialScatterW):
                     set_brush(self.layer_manager.brush_sprite,self.layer_manager.brush_size)
                     paintLine((touch.x,touch.y,touch.x+1,touch.y+1))                    
             elif self.layer_manager.mode == "zoom":
-                print "here"
                 super(AbstractLayer, self).on_touch_down(touch)
             return True
             
@@ -76,7 +75,7 @@ class AbstractLayer(specialScatterW):
                 super(AbstractLayer, self).on_touch_move(touch)
             elif self.layer_manager.mode == "draw":
                 cur_pos = self.to_local(touch.x,touch.y)
-                ox,oy = self.touches[touch.id]
+                ox,oy = touch.x,touch.y
                 with self.fbo:
                     set_color(*self.layer_manager.brush_color)
                     set_brush(self.layer_manager.brush_sprite,self.layer_manager.brush_size)
@@ -84,10 +83,10 @@ class AbstractLayer(specialScatterW):
                 self.touches[touch.id] = self.to_local(touch.x,touch.y)
             return True
             
-    def on_touch_up(self, touch):
-        if self.collide_point(touch.x,touch.y): 
-            del self.touches[touch.id]
-            return True
+    #def on_touch_up(self, touch):
+    #    if self.collide_point(touch.x,touch.y): 
+    #        del self.touches[touch.id]
+    #        return True
             
     def getLayerManager(self):
         return self.layer_manager

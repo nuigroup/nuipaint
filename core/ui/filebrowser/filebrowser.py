@@ -126,12 +126,16 @@ class MTFileBrowser(MTScatterWidget):
         self.register_event_type('on_select')
         self.selected_files = []
         
-        self.action_button = MTButton(label=self.type,pos=(10,5),cls=('simple', 'colored'),size=(50,30))
+        self.action_button = MTButton(label=self.type,pos=(10,5),cls=('simple'),size=(50,30))
         self.add_widget(self.action_button)
         
         @self.action_button.event
         def on_press(*largs):
-            self.dispatch_event('on_select',self.selected_files)   
+            self.dispatch_event('on_select',self.selected_files)
+            self.hide()
+            self.selected_files = []
+            for child in self.kb.pchildren:
+                child.selected = False
         
         self.input = MTFormInput(font_size=16,pos=(self.action_button.width+20,5))
         self.input.height = 30

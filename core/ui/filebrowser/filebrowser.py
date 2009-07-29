@@ -68,7 +68,7 @@ class MTFileEntry(MTIconObject, MTKineticObject):
         super(MTFileEntry, self).__init__(**kwargs)
         
     def on_press(self, touch):
-        if touches[touch.id].is_double_tap:
+        if touch.is_double_tap:
             if os.path.isdir(self.filename):
                 self.browser.set_path(self.filename)
             else:

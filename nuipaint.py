@@ -32,13 +32,13 @@ class FullScreenPaint(MTWidget):
         self.add_widget(lm)
         
         #File Browser
-        fb = MTFileBrowser(pos=(100,500),size=(400,300))
+        fb = MTFileBrowser(pos=(100,400),size=(400,380))
         self.add_widget(fb)
         fb.hide()
         
         @fb.event
-        def on_open_file(filename):
-            print "here",filename       
+        def on_select(filelist):
+            print filelist       
             
         #Bottom Toolbar
         tb = toolbar(win=w,canvas=self.canvas)

@@ -36,6 +36,10 @@ class FullScreenPaint(MTWidget):
         self.add_widget(fb)
         fb.hide()
         
+        @fb.event
+        def on_open_file(filename):
+            print "here",filename       
+            
         #Bottom Toolbar
         tb = toolbar(win=w,canvas=self.canvas)
         self.add_widget(tb)    

@@ -66,16 +66,17 @@ class MTFileEntry(MTIconObject, MTKineticObject):
         self.filename   = kwargs.get('filename')
         self.browser    = kwargs.get('browser')
         super(MTFileEntry, self).__init__(**kwargs)
+        self.opened = False
         
     def on_press(self, touch):
         if touch.is_double_tap:
             if os.path.isdir(self.filename):
                 self.browser.set_path(self.filename)
             else:
-                print "icon"
-            #if self.db.visible and self.db.on_touch_down(touches, touchID, x, y):
-            #    return True
-            
+                if not self.opened:
+                    self.parent.parent.dispatch_event('on_open_file',self.filename)
+                    self.opened = True
+    
 class MTFileBrowser(MTScatterWidget):
     def __init__(self, **kwargs):
         super(MTFileBrowser, self).__init__(**kwargs)
@@ -90,7 +91,9 @@ class MTFileBrowser(MTScatterWidget):
         @self.close_button.event
         def on_press(touch):
             self.hide()
-  
+        
+        self.register_event_type('on_open_file')
+ 
     def update_listing(self):
         self.path = os.path.abspath(self.path)
         for name in os.listdir(self.path):
@@ -113,5 +116,8 @@ class MTFileBrowser(MTScatterWidget):
                 self.update_listing()
         self.dl.draw()
         super(MTFileBrowser, self).on_draw()
+        
+    def on_open_file(self,filename):
+        pass
 
 

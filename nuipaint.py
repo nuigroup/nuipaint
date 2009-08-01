@@ -79,7 +79,11 @@ class NUIPaint(windowing):
         super(NUIPaint, self).__init__(**kwargs)
         self.win = kwargs.get('window')
         
-        self.canvas = Canvas(size=(540,440),pos=(self.win.width/2-260,self.win.height/2-120),cls=('roundedBorder'))#Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'),background="images/photo3.jpg")
+        if kwargs.get('file'):
+            print kwargs.get('file')
+            self.canvas = Canvas(size=(384,512),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'),background=kwargs.get('file'))
+        else:
+            self.canvas = Canvas(size=(540,440),pos=(self.win.width/2-260,self.win.height/2-120),cls=('roundedBorder'))
         
         self.full_mode_painter = FullScreenPaint(window=self.win,canvas=self.canvas, handler = self)      
         
@@ -109,6 +113,9 @@ if __name__ == '__main__':
     
     in_win2 = NUIPaint(window = w,pos=(500,400),size=(500,400),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.2,0.2,0.2),'bg-color-full':(0.2,0.2,.2),'border-width':20})
     w.add_widget(in_win2)
+    
+    in_win3 = NUIPaint(file=os.path.join('images','photo.jpg'),window = w,pos=(300,400),size=(384,512),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.2,0.2,0.2),'bg-color-full':(0.2,0.2,.2),'border-width':20})
+    w.add_widget(in_win3)
 
     runTouchApp()
   

@@ -17,7 +17,7 @@ class LayerManager(MTScatterWidget):
         self.brush_sprite = "brushes/brush_particle.png"
         self.brush_size = 64
         if kwargs.get('background'):
-            self.background = ImageLayer(size=self.size,color=(1,1,1,1),moveable=False,layer_manager=self)
+            self.background = ImageLayer(size=self.size,color=(1,1,1,1),moveable=False,layer_manager=self,file=kwargs.get('background'))
         else:
             self.background = NormalLayer(size=self.size,color=(1,1,1,1),moveable=False,layer_manager=self)
         self.add_widget(self.background)

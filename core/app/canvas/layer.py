@@ -126,7 +126,7 @@ class ImageLayer(AbstractLayer):
             kwargs.setdefault('do_translation', False)
         super(ImageLayer, self).__init__(**kwargs)
         self.highlight =  False 
-        self.background = "images/photo3.jpg"
+        self.background = kwargs.get('file')
         img = pyglet.image.load(self.background)
         self.image  = pyglet.sprite.Sprite(img)
   

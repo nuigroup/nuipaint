@@ -2,29 +2,11 @@ from __future__ import with_statement
 from pymt import *
 import pyglet
 
-default_vertex = """
-void main()
-
-{
-   gl_TexCoord[0] = gl_MultiTexCoord0;
-   gl_Position = ftransform();
-}
-"""
-
-default_fragment = """
-uniform sampler2D last_spot;
-void main()
-{
-   vec4 col = texture2D(last_spot, gl_TexCoord[0].st);
-   gl_FragColor = mix(gl_FragColor, col, 1.0);
-}
-"""
-
 class Filter:
     def __init__(self):
-        self.shader = Shader(vertex_source=default_vertex, fragment_source=default_fragment)
+        self.shader = None
         self.current_shader = 0
-        self.fbo = Fbo(size=(512,512), with_depthbuffer=False)
+        self.fbo = None
         self.current_texture = None
         
     def blur(self,texture,texture_size,value):

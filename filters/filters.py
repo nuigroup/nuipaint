@@ -159,3 +159,39 @@ class Filter:
             self.shader.stop()
             
         return self.fbo.texture
+        
+    def brightness(self,texture,texture_size,value):
+        brightnessv_shader_src = """
+            void main() {
+               gl_TexCoord[0] = gl_MultiTexCoord0;
+               gl_Position = ftransform();
+            }
+        """
+        
+        brightnessf_shader_src = """
+            uniform float value;
+            uniform sampler2D last_spot;
+            void main()
+            {
+               vec4 col = texture2D(last_spot, gl_TexCoord[0].st);
+               gl_FragColor = mix(gl_FragColor, col, value);
+            }
+        """
+        
+        if self.current_shader != 2 :
+            self.shader = Shader(vertex_source=brightnessv_shader_src, fragment_source=brightnessf_shader_src)
+            self.current_shader = 2
+            
+        if self.current_texture != texture :    
+            self.current_texture = texture
+            self.fbo = Fbo(size=texture_size, with_depthbuffer=False)
+            
+        #run glsl code
+        with self.fbo:
+            self.shader.use()
+            self.shader['value'] = value
+            set_color(1, 1, 1)
+            drawTexturedRectangle(self.current_texture, size=self.fbo.size)
+            self.shader.stop()
+            
+        return self.fbo.texture

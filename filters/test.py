@@ -28,31 +28,45 @@ class Canvas(MTScatterWidget):
     def applyFilter(self,type,value):
         if type == "blur":
             self.fbo.texture = self.filter.blur(self.tex,self.size,value)
-        elif type == "sharpen":
+        elif type == "sharp":
             self.fbo.texture = self.filter.sharpen(self.tex,self.size,value)
+        elif type == "brightness":
+            self.fbo.texture = self.filter.brightness(self.tex,self.size,value)
 
 
 m = MTWindow()
 c = Canvas()
 m.add_widget(c)
 
-blur = MTLabel(label="Blur")
-m.add_widget(blur)
+lay = MTGridLayout(rows=3, cols=2)
+m.add_widget(lay)
 
-blur_slide = MTSlider(min=0.0,max=5.0,pos=(blur.width+10,0),orientation="horizontal")
-m.add_widget(blur_slide)
+blur = MTLabel(label="Blur")
+lay.add_widget(blur)
+
+blur_slide = MTSlider(min=0.0,max=5.0,orientation="horizontal")
+lay.add_widget(blur_slide)
 @blur_slide.event
 def on_value_change(value):
     c.applyFilter("blur",value)
 
-sharp = MTLabel(label="Sharp",pos=(0,40))
-m.add_widget(sharp)
+sharp = MTLabel(label="Sharp")
+lay.add_widget(sharp)
 
-sharp_slide = MTSlider(min=0.0,max=5.0,pos=(sharp.width+10,40),orientation="horizontal")
-m.add_widget(sharp_slide)
+sharp_slide = MTSlider(min=0.0,max=5.0,orientation="horizontal")
+lay.add_widget(sharp_slide)
 @sharp_slide.event
 def on_value_change(value):
-    c.applyFilter("sharpen",value)    
+    c.applyFilter("sharp",value)    
+    
+brightness = MTLabel(label="Brightness")
+lay.add_widget(brightness)
+
+brightness_slide = MTSlider(min=0.0,max=2.0,orientation="horizontal")
+lay.add_widget(brightness_slide)
+@brightness_slide.event
+def on_value_change(value):
+    c.applyFilter("brightness",value)    
     
 
 runTouchApp()

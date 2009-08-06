@@ -32,13 +32,21 @@ class Canvas(MTScatterWidget):
             self.fbo.texture = self.filter.sharpen(self.tex,self.size,value)
         elif type == "brightness":
             self.fbo.texture = self.filter.brightness(self.tex,self.size,value)
+        elif type == "contrast":
+            self.fbo.texture = self.filter.contrast(self.tex,self.size,value)
+        elif type == "saturation":
+            self.fbo.texture = self.filter.saturation(self.tex,self.size,value)
+        elif type == "bw":
+            self.fbo.texture = self.filter.bw(self.tex,self.size,value)
+        elif type == "sepia":
+            self.fbo.texture = self.filter.sepia(self.tex,self.size,value)
 
 
 m = MTWindow()
 c = Canvas()
 m.add_widget(c)
 
-lay = MTGridLayout(rows=3, cols=2)
+lay = MTGridLayout(rows=8, cols=4)
 m.add_widget(lay)
 
 blur = MTLabel(label="Blur")
@@ -66,7 +74,43 @@ brightness_slide = MTSlider(min=0.0,max=2.0,orientation="horizontal")
 lay.add_widget(brightness_slide)
 @brightness_slide.event
 def on_value_change(value):
-    c.applyFilter("brightness",value)    
+    c.applyFilter("brightness",value)   
+
+contrast = MTLabel(label="Contrast")
+lay.add_widget(contrast)
+
+contrast_slide = MTSlider(min=1.0,max=2.0,orientation="horizontal")
+lay.add_widget(contrast_slide)
+@contrast_slide.event
+def on_value_change(value):
+    c.applyFilter("contrast",value)    
+
+saturation = MTLabel(label="Saturation")
+lay.add_widget(saturation)
+
+saturation_slide = MTSlider(min=0.0,max=2.0,orientation="horizontal")
+lay.add_widget(saturation_slide)
+@saturation_slide.event
+def on_value_change(value):
+    c.applyFilter("saturation",value)     
+    
+bw = MTLabel(label="Black & White")
+lay.add_widget(bw)
+
+bw_slide = MTSlider(min=0.0,max=2.0,orientation="horizontal")
+lay.add_widget(bw_slide)
+@bw_slide.event
+def on_value_change(value):
+    c.applyFilter("bw",value) 
+    
+sepia = MTLabel(label="Sepia")
+lay.add_widget(sepia)
+
+sepia_slide = MTSlider(min=0.0,max=2.0,orientation="horizontal")
+lay.add_widget(sepia_slide)
+@sepia_slide.event
+def on_value_change(value):
+    c.applyFilter("sepia",value) 
     
 
 runTouchApp()

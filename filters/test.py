@@ -40,6 +40,8 @@ class Canvas(MTScatterWidget):
             self.fbo.texture = self.filter.bw(self.tex,self.size,value)
         elif type == "sepia":
             self.fbo.texture = self.filter.sepia(self.tex,self.size,value)
+        elif type == "radialblur":
+            self.fbo.texture = self.filter.radialblur(self.tex,self.size,value)
 
 
 m = MTWindow()
@@ -111,6 +113,14 @@ lay.add_widget(sepia_slide)
 @sepia_slide.event
 def on_value_change(value):
     c.applyFilter("sepia",value) 
-    
+
+radialblur = MTLabel(label="Radial Blur")
+lay.add_widget(radialblur)
+
+radialblur_slide = MTSlider(min=0.0,max=2.0,orientation="horizontal")
+lay.add_widget(radialblur_slide)
+@radialblur_slide.event
+def on_value_change(value):
+    c.applyFilter("radialblur",value)     
 
 runTouchApp()

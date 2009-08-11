@@ -1,6 +1,7 @@
 from __future__ import with_statement
 from math import cos,sin,pi
 from pymt import *
+from pyglet import clock
 
 from core import *
 
@@ -103,18 +104,35 @@ class NUIPaint(windowing):
         self.canvas.disableTransformations()
         self.canvas.init_transform((-20,-20), 0, 1)
         self.remove_widget(self.full_mode_painter)
+
+def init_nuipaint(w, *largs):    
+    fb = MTFileBrowser(pos=(100,400),size=(400,380))
+    w.add_widget(fb)
+    fb.hide()
+    
+    new_button = MTIconButton(pos=(10,10),icon_file="gfx/icons/new_L.png",label="New")
+    w.add_widget(new_button)
+    
+    @new_button.event
+    def on_press(touch):
+        new_win = NUIPaint(window = w,pos=(100,100),size=(500,400),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.3,0.3,0.3),'bg-color-full':(0.3,0.3,0.3),'border-width':20})
+        w.add_widget(new_win)
+    
+    open_button = MTIconButton(pos=(new_button.width+30,10),icon_file="gfx/icons/open_L.png",label="Open")
+    w.add_widget(open_button)
+    
+    @open_button.event
+    def on_press(touch):
+        fb.show()
+        
+    @fb.event
+    def on_select(list):
+        img = pyglet.image.load(list[0])
+        open_window = NUIPaint(file=list[0],window = w,pos=(300,400),size=(img.width,img.height),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.2,0.2,0.2),'bg-color-full':(0.2,0.2,.2),'border-width':20})
+        w.add_widget(open_window)
     
 if __name__ == '__main__':
     w = MTWindow()
-    
-    in_win = NUIPaint(window = w,pos=(100,100),size=(500,400),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.3,0.3,0.3),'bg-color-full':(0.3,0.3,0.3),'border-width':20})
-    w.add_widget(in_win)
-    
-    in_win2 = NUIPaint(window = w,pos=(500,400),size=(500,400),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.3,0.3,0.3),'bg-color-full':(0.3,0.3,0.3),'border-width':20})
-    w.add_widget(in_win2)
-    
-    #in_win3 = NUIPaint(file=os.path.join('images','photo.jpg'),window = w,pos=(300,400),size=(384,512),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.2,0.2,0.2),'bg-color-full':(0.2,0.2,.2),'border-width':20})
-    #w.add_widget(in_win3)
-
+    clock.schedule_once(curry(init_nuipaint, w), 0)    
     runTouchApp()
   

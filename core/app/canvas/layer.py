@@ -104,7 +104,7 @@ class AbstractLayer(specialScatterW):
         self.fbo = Fbo(size=(self.width, self.height), with_depthbuffer=False)                
         self.color = (1,1,1,1)
         self.bgcolor = (1,1,1,1)
-        #self.layer_clear()
+        self.layer_clear()
         self.id = kwargs.get('id')
         self.smudge_shader = Shader(vertex_shader_src, fragment_shader_src)
         self.temp_tex = None
@@ -117,7 +117,7 @@ class AbstractLayer(specialScatterW):
                 glClearColor(*self.color)
             glClear(GL_COLOR_BUFFER_BIT)
             glClearColor(1,1,1,1)
-            set_color(self.color)
+            set_color(self.bgcolor)
             drawRectangle((0,0),(self.width,self.height))
 
     def on_touch_down(self, touch):
@@ -211,6 +211,7 @@ class NormalLayer(AbstractLayer):
             drawRectangle((0,0),(self.width,self.height))
             drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))
         else:
+            glColor4f(*self.bgcolor)
             drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))
             if self.highlight == True :
                 glColor4f(0,0,1,0.2)

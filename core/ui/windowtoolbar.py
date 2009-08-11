@@ -37,6 +37,10 @@ class windowBar(MTWidget):
         def on_release(touch):
             self.tinycolor.hide()
             
+        @save.event
+        def on_press(touch):
+            self.canvas.save_image()
+            
         @self.tinycolor.event
         def on_color_change(color):
             self.canvas.set_brush_color((color[0],color[1],color[2]))

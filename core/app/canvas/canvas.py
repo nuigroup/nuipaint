@@ -35,7 +35,8 @@ class Canvas(MTScatterWidget):
             self.layer_manager.background.dispatch_event('on_draw')
             for layer in self.layer_manager.layer_list :
                 layer.dispatch_event('on_draw')
-		data = (self.fbo.texture).get_image_data()
+            
+        data = (self.fbo.texture).get_image_data()
         data.save(file='test.png')
         
     def set_brush_color(self,color):

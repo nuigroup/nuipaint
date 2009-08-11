@@ -28,7 +28,7 @@ class Canvas(MTScatterWidget):
         self.height = 400
         self.fbo = Fbo(size=(self.width, self.height), with_depthbuffer=False)
         self.color = (0,1,0,1.0)
-        set_brush('brushes/brush_particle.png')
+        set_brush('../../../brushes/brush_particle.png')
         self.layer_clear()
         self.touch_positions = {}
         self.mode = "zoom"
@@ -43,18 +43,18 @@ class Canvas(MTScatterWidget):
         glClear(GL_COLOR_BUFFER_BIT)
         self.fbo.release()
 
-    def on_touch_down(self, touches, touchID, x, y):
-        if self.collide_point(x,y): 
-            self.touch_positions[touchID] = self.to_local(x,y)            
+    def on_touch_down(self, touch):
+        if self.collide_point(touch.x,touch.y): 
+            self.touch_positions[touch.id] = self.to_local(touch.x,touch.y)            
             if self.mode == "draw":
                 self.fbo.bind()
                 set_color(*self.brush_color)
-                drawCircle(pos=self.to_local(x,y), radius=1)            
+                drawCircle(pos=self.to_local(touch.x,touch.y), radius=1)            
                 self.fbo.release()
             elif self.mode == "zoom":
-                super(Canvas, self).on_touch_down(touches, touchID, x, y)
+                super(Canvas, self).on_touch_down(touch)
             elif self.mode == "smudge":
-                self.smudge((self.touch_positions[touchID][0],self.touch_positions[touchID][1]))                
+                self.smudge((self.touch_positions[touch.id][0],self.touch_positions[touch.id][1]))                
             return True
             
     def on_touch_move(self, touches, touchID, x, y):
@@ -92,3 +92,8 @@ class Canvas(MTScatterWidget):
             self.smudge_shader.use()
             drawTexturedRectangle(region, pos=origin, size=(32, 32))
             self.smudge_shader.stop()
+            
+m = MTWindow()
+c = Canvas(size=(500,500))
+m.add_widget(c)
+runTouchApp()

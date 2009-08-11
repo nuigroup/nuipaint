@@ -2,6 +2,7 @@ from __future__ import with_statement
 from pymt import *
 from pyglet.gl import *
 from core.ui.toolbar import toolbarHolder
+from core.app.colorselector.tinycolorpicker import MTTinyColorPicker
 
 class windowBar(MTWidget):
     def __init__(self, **kwargs):
@@ -20,7 +21,24 @@ class windowBar(MTWidget):
         tb.size = (tb._get_content_width()-65,tb.height)
         tb.pos = (int(self.handler.size[0]/2-tb.size[0]/2), -5)
         
+        self.tinycolor = MTTinyColorPicker(pos=(color.pos[0]-45,color.pos[1]+35))
+        self.add_widget(self.tinycolor)
+        self.tinycolor.hide()
 
         @brush.event
         def on_press(touch):
             self.canvas.set_mode("draw")
+        
+        @color.event
+        def on_press(touch):
+            self.tinycolor.show()
+            
+        @color.event
+        def on_release(touch):
+            self.tinycolor.hide()
+            
+        @self.tinycolor.event
+        def on_color_change(color):
+            self.canvas.set_brush_color((color[0],color[1],color[2]))
+            
+        

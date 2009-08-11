@@ -80,7 +80,6 @@ class NUIPaint(windowing):
         self.win = kwargs.get('window')
         
         if kwargs.get('file'):
-            print kwargs.get('file')
             self.canvas = Canvas(size=(384,512),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'),background=kwargs.get('file'))
         else:
             self.canvas = Canvas(size=(540,440),pos=(self.win.width/2-260,self.win.height/2-120),cls=('roundedBorder'))
@@ -108,14 +107,14 @@ class NUIPaint(windowing):
 if __name__ == '__main__':
     w = MTWindow()
     
-    in_win = NUIPaint(window = w,pos=(100,100),size=(500,400),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.2,0.2,0.2),'bg-color-full':(0.2,0.2,.2),'border-width':20})
+    in_win = NUIPaint(window = w,pos=(100,100),size=(500,400),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.3,0.3,0.3),'bg-color-full':(0.3,0.3,0.3),'border-width':20})
     w.add_widget(in_win)
     
-    in_win2 = NUIPaint(window = w,pos=(500,400),size=(500,400),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.2,0.2,0.2),'bg-color-full':(0.2,0.2,.2),'border-width':20})
+    in_win2 = NUIPaint(window = w,pos=(500,400),size=(500,400),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.3,0.3,0.3),'bg-color-full':(0.3,0.3,0.3),'border-width':20})
     w.add_widget(in_win2)
     
-    in_win3 = NUIPaint(file=os.path.join('images','photo.jpg'),window = w,pos=(300,400),size=(384,512),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.2,0.2,0.2),'bg-color-full':(0.2,0.2,.2),'border-width':20})
-    w.add_widget(in_win3)
+    #in_win3 = NUIPaint(file=os.path.join('images','photo.jpg'),window = w,pos=(300,400),size=(384,512),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.2,0.2,0.2),'bg-color-full':(0.2,0.2,.2),'border-width':20})
+    #w.add_widget(in_win3)
 
     runTouchApp()
   

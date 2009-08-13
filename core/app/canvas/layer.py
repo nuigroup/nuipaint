@@ -1,6 +1,7 @@
 from __future__ import with_statement
 from pymt import *
 from pyglet.gl import *
+from filters import *
 
 vertex_shader_src = """
 void main()
@@ -8,32 +9,6 @@ void main()
    gl_TexCoord[0] = gl_MultiTexCoord0;
    //gl_TexCoord[1] = gl_MultiTexCoord1;
    gl_Position = ftransform();
-}
-"""
-
-fragment_shader_src = """
-    uniform sampler2D   tex;
-    uniform float direction;
-    uniform float kernel_size;
-    uniform float size_x ;
-    uniform float size_y ;
-    uniform float value;
-void main (void) {
-    float rho = 10.0;
-    vec2 dir = direction < 0.5 ? vec2(1.0,0.0) : vec2(0.0,1.0);
-
-    float dx = 1.0 / size_x;
-    float dy = 1.0 / size_y;
-    vec2  st = gl_TexCoord [0].st;
-
-    vec4    color = vec4 (0.0, 0.0, 0.0, 0.0);
-    float   weight = 0.0;
-    for (float i = -1.0*kernel_size ; i <= kernel_size ; i+=1.0) {
-        float fac = exp (-(i * i) / (2.0 * rho * rho));
-        weight += fac;
-        color += texture2D (tex, st + vec2 (dx*i, dy*i) * dir) * fac;
-    }
-    gl_FragColor =  color / weight;
 }
 """
 
@@ -106,8 +81,9 @@ class AbstractLayer(specialScatterW):
         self.bgcolor = (1,1,1,1)
         self.layer_clear()
         self.id = kwargs.get('id')
-        self.smudge_shader = Shader(vertex_shader_src, fragment_shader_src)
+        #self.smudge_shader = Shader(vertex_shader_src, fragment_shader_src)
         self.temp_tex = None
+        self.filter = Filter()
 
     def layer_clear(self):
         with self.fbo:
@@ -173,15 +149,17 @@ class AbstractLayer(specialScatterW):
     def smudge(self, origin, location=(0,0)):
         x,y = map(int,origin)
         region = self.fbo.texture.get_region(x - 16, y - 16, 32, 32)
+        alt = self.filter.blur(region,(32,32),2.0)
+        
         with self.fbo:
-            self.smudge_shader.use()
-            self.smudge_shader['size_x'] = 32
-            self.smudge_shader['size_y'] = 32
-            self.smudge_shader['kernel_size'] = 3.0
-            self.smudge_shader['direction'] = 0.0
-            drawTexturedRectangle(self.temp_tex, pos=origin, size=(32, 32))
-            drawTexturedRectangle(region, pos=origin, size=(32, 32))
-            self.smudge_shader.stop()
+            #self.smudge_shader.use()
+            #self.smudge_shader['size_x'] = 32
+            #self.smudge_shader['size_y'] = 32
+            #self.smudge_shader['kernel_size'] = 3.0
+            #self.smudge_shader['direction'] = 0.0
+            #drawTexturedRectangle(self.temp_tex, pos=origin, size=(32, 32))
+            drawTexturedRectangle(alt, pos=origin, size=(32, 32))
+            #self.smudge_shader.stop()
          
 
 class NormalLayer(AbstractLayer):

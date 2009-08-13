@@ -1,7 +1,6 @@
 from __future__ import with_statement
 from pymt import *
 from pyglet.gl import *
-from numpy import *
 
 class MTTinyColorPicker(MTWidget):
     def __init__(self, **kwargs):

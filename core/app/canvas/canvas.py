@@ -5,23 +5,26 @@ from layermanager import *
 
 class Canvas(MTScatterWidget):
     def __init__(self, **kwargs):
-        super(Canvas, self).__init__(**kwargs)
+        super(Canvas, self).__init__(**kwargs)        
         if kwargs.get('background'):
             self.back_image = pyglet.image.load(kwargs.get('background'))
             self.size = (self.back_image.width,self.back_image.height)
-        self.canvas_area = MTStencilContainer(pos=(20,20),size=(self.width-40,self.height-40))
+            
+        self.canvas_area = MTStencilContainer(pos=(20,20),size=(self.width,self.height))
         self.add_widget(self.canvas_area)
         if kwargs.get('background'):
-            self.layer_manager = LayerManager(pos=(20,20),canvas=self,size=(self.width-40,self.height-40),background=kwargs.get('background'))
+            self.layer_manager = LayerManager(pos=(20,20),canvas=self,size=(self.width,self.height),background=kwargs.get('background'))
         else:
-            self.layer_manager = LayerManager(pos=(20,20),canvas=self,size=(self.width-40,self.height-40))
+            self.layer_manager = LayerManager(pos=(20,20),canvas=self,size=(self.width,self.height))
         self.canvas_area.add_widget(self.layer_manager)
         self.fbo = Fbo(size=(self.width, self.height), with_depthbuffer=False)
+        self.canvas_size = kwargs.get('size')
+        self.size = (self.canvas_size[0]+40,self.canvas_size[1]+40)
 
 		
     def draw(self):
         with gx_matrix:
-            glColor4f(0,0,0,1)
+            glColor4f(0.3,0.3,0.3,1)
             drawCSSRectangle((0,0),(self.width,self.height),style=self.style)
             
     def set_mode(self,mode):
@@ -32,8 +35,10 @@ class Canvas(MTScatterWidget):
         
     def save_image(self):
         with self.fbo:
+            set_color(1, 1, 1, .99) 
             self.layer_manager.background.dispatch_event('on_draw')
             for layer in self.layer_manager.layer_list :
+                set_color(1, 1, 1, .99) 
                 layer.dispatch_event('on_draw')
             
         data = (self.fbo.texture).get_image_data()

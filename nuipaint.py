@@ -13,6 +13,8 @@ additional_css = '''
 
 '''
 css_add_sheet(additional_css)
+fb = None
+fb_hidden = True
 
 
 class FullScreenPaint(MTWidget):
@@ -81,9 +83,9 @@ class NUIPaint(windowing):
         self.win = kwargs.get('window')
         
         if kwargs.get('file'):
-            self.canvas = Canvas(size=(384,512),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'),background=kwargs.get('file'))
+            self.canvas = Canvas(size=(self.size[0],self.size[1]),pos=(0,0),cls=('roundedBorder'),background=kwargs.get('file'))
         else:
-            self.canvas = Canvas(size=(540,440),pos=(self.win.width/2-260,self.win.height/2-120),cls=('roundedBorder'))
+            self.canvas = Canvas(size=(self.size[0],self.size[1]),pos=(40,40),cls=('roundedBorder'))
         
         self.full_mode_painter = FullScreenPaint(window=self.win,canvas=self.canvas, handler = self)      
         
@@ -105,31 +107,53 @@ class NUIPaint(windowing):
         self.canvas.init_transform((-20,-20), 0, 1)
         self.remove_widget(self.full_mode_painter)
 
-def init_nuipaint(w, *largs):    
+def init_nuipaint(w, *largs): 
+    global fb,fb_hidden   
     fb = MTFileBrowser(pos=(100,400),size=(400,380))
     w.add_widget(fb)
     fb.hide()
+    fb_hidden = True
     
     new_button = MTIconButton(pos=(10,10),icon_file="gfx/icons/new_L.png",label="New")
     w.add_widget(new_button)
     
     @new_button.event
     def on_press(touch):
-        new_win = NUIPaint(window = w,pos=(100,100),size=(500,400),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.3,0.3,0.3),'bg-color-full':(0.3,0.3,0.3),'border-width':20})
-        w.add_widget(new_win)
+        win  = MTPopup(label_submit="Create", title="New Canvas",size=(400, 350))
+        win.add_widget(MTLabel(label="Width", font_size=14, bold=True))
+        width_txt = MTTextInput(height=20,label="500")
+        win.add_widget(width_txt)
+        win.add_widget(MTLabel(label="Height", font_size=14, bold=True))
+        height_txt = MTTextInput(height=20,label="400")
+        win.add_widget(height_txt)
+        w.add_widget(win)
+        @win.event
+        def on_submit(*largs):
+            new_win = NUIPaint(window = w,pos=(200,200),size=(int(width_txt.get_label()),int(height_txt.get_label())),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.3,0.3,0.3),'bg-color-full':(0.3,0.3,0.3),'border-width':20})
+            w.add_widget(new_win)
     
     open_button = MTIconButton(pos=(new_button.width+30,10),icon_file="gfx/icons/open_L.png",label="Open")
     w.add_widget(open_button)
     
     @open_button.event
     def on_press(touch):
-        fb.show()
+        global fb,fb_hidden
+        if fb_hidden:
+            fb.show()            
+        else:
+            fb = MTFileBrowser(pos=(100,400),size=(400,380))
+            w.add_widget(fb)
+
         
     @fb.event
     def on_select(list):
+        global fb_hidden
+        if len(list) == 0:
+            return
         img = pyglet.image.load(list[0])
-        open_window = NUIPaint(file=list[0],window = w,pos=(300,400),size=(img.width,img.height),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.2,0.2,0.2),'bg-color-full':(0.2,0.2,.2),'border-width':20})
+        open_window = NUIPaint(file=list[0],window = w,pos=(200,200),size=(img.width,img.height),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.3,0.3,0.3),'bg-color-full':(0.3,0.3,0.3),'border-width':20})
         w.add_widget(open_window)
+        fb_hidden = False
     
 if __name__ == '__main__':
     w = MTWindow()

@@ -144,12 +144,12 @@ class AbstractLayer(specialScatterW):
         
     def settemptex(self, origin, location=(0,0)):
         x,y = map(int,origin)
-        return self.fbo.texture.get_region(x - 16, y - 16, 32, 32)
+        return self.fbo.texture.get_region(x - 16, y - 16, 3, 32)
         
     def smudge(self, origin, location=(0,0)):
         x,y = map(int,origin)
-        region = self.fbo.texture.get_region(x - 16, y - 16, 32, 32)
-        alt = self.filter.blur(region,(32,32),2.0)
+        region = self.fbo.texture.get_region(x - 8, y - 8, 16, 16)
+        alt = self.filter.blur(region,(16,16),0.5)
         
         with self.fbo:
             #self.smudge_shader.use()
@@ -176,7 +176,7 @@ class NormalLayer(AbstractLayer):
 
     def clearfbo(self):
         with self.fbo:
-            glColor4f(1,1,1,1)
+            set_color(1, 1, 1, 1)
             drawRectangle(pos=(0,0),size=(self.width,self.height))
         
     def draw(self):
@@ -185,14 +185,14 @@ class NormalLayer(AbstractLayer):
         #    self.clearfbo()
         #    self.need_redraw = False
         if self.moveable == False :
-            glColor4f(*self.bgcolor)
+            set_color(*self.bgcolor)
             drawRectangle((0,0),(self.width,self.height))
             drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))
         else:
-            glColor4f(*self.bgcolor)
+            set_color(*self.bgcolor)
             drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))
             if self.highlight == True :
-                glColor4f(0,0,1,0.2)
+                set_color(0,0,1,0.2)
                 drawRectangle((0,0),(self.width,self.height))                    
 
 class ImageLayer(AbstractLayer):
@@ -207,11 +207,15 @@ class ImageLayer(AbstractLayer):
         self.highlight =  False 
         self.background = kwargs.get('file')
         img = pyglet.image.load(self.background)
-        self.image  = pyglet.sprite.Sprite(img)
+        self.tex  = img.get_texture()
+        self.size = (img.width,img.height)
+        with self.fbo:
+            set_color(1, 1, 1, 1) 
+            drawTexturedRectangle(self.tex, (0,0),(self.width,self.height))
   
         
     def draw(self):
         with gx_matrix:
-                self.image.draw()
-                drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))
+            set_color(1, 1, 1, 1) 
+            drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))
  

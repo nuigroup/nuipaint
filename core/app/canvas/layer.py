@@ -99,9 +99,7 @@ class AbstractLayer(MTScatterWidget):
 
     def on_touch_down(self, touch):
         if self.collide_point(touch.x,touch.y): 
-            #prevx,prevy = touch.x,touch.y
             touches = getAvailableTouchs()
-            self.touches[touch.id] = self.to_local(touch.x,touch.y)
             if len(touches)==2 :                
                 if touch.is_double_tap:
                     self.layer_manager.move_layer_down(self.id)
@@ -129,17 +127,11 @@ class AbstractLayer(MTScatterWidget):
                     set_color(*self.layer_manager.brush_color)
                     set_brush(self.layer_manager.brush_sprite,self.layer_manager.brush_size)
                     paintLine((ox,oy,cur_pos[0],cur_pos[1]))                    
-                self.touches[touch.id] = self.to_local(touch.x,touch.y)
             elif self.layer_manager.mode == "smudge":
                 self.smudge(self.to_local(touch.x,touch.y))
                 self.temp_tex = self.settemptex(self.to_local(touch.x,touch.y))
             return True
-            
-    #def on_touch_up(self, touch):
-    #    if self.collide_point(touch.x,touch.y): 
-    #        del self.touches[touch.id]
-    #        return True
-            
+
     def getLayerManager(self):
         return self.layer_manager
         

@@ -12,17 +12,17 @@ class AlphaWindow(MTWidget):
     def draw(self):
         if self.need_redraw:
             with self.fbo1:
-                set_color(0, 0, 0, 0)
+                set_color(1, 1, 1, 0)
                 drawRectangle(size=self.tsize)
                 set_color(0, 0, 1)
                 drawLine((10, 10 , 40, 40), width=8)
             with self.fbo2:
-                set_color(0, 0, 0, 0)
+                set_color(1, 1, 1, 0)
                 drawRectangle(size=self.tsize)
                 set_color(0, 1, 0)
                 drawLine((10, 40 , 40, 10), width=8)
                 set_color(0, 0, 0)
-                drawLine((10, 24 , 40, 24), width=8)
+                drawLine((10, 34 , 40, 34), width=8)
             self.need_redraw = False
 
         alpha = (GL_ZERO, GL_ONE, GL_DST_COLOR, GL_ONE_MINUS_DST_COLOR,

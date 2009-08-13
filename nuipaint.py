@@ -23,13 +23,8 @@ class FullScreenPaint(MTWidget):
         #Canvas
         w = kwargs.get('window')
         handler = kwargs.get('handler')
-        #self.canvas = Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'))#Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'),background="images/photo3.jpg")
         self.canvas = kwargs.get('canvas')
         self.add_widget(self.canvas) 
-        
-        #cv.create_layer(pos=(100,100),size=(200,200))
-        #cv.create_layer(size=(300,200))
-        #cv.create_layer(size=(250,150))
         
         lm = LayerManagerList(pos=(w.width-200,w.height-300),layer_manager=self.canvas.getListManager(),cls=('roundedBorder'))
         self.add_widget(lm)
@@ -57,9 +52,6 @@ class FullScreenPaint(MTWidget):
         cs = MTColorSelector(pos=(w.width-200,0),size=(200,200),win=w,canvas=self.canvas)
         self.add_widget(cs)
         
-        #cv2 = Canvas(size=(540,440),pos=(w.width/2-260,w.height/2-120),cls=('roundedBorder'),background="images/photo3.jpg")
-        #w.add_widget(cv2)
-    
     def set_canvas(self, canvas):
         self.canvas = canvas
 
@@ -109,7 +101,7 @@ class NUIPaint(windowing):
 
 def init_nuipaint(w, *largs): 
     global fb,fb_hidden   
-    fb = MTFileBrowser(pos=(100,400),size=(400,380))
+    fb = MTFileBrowser(pos=(100,100),size=(400,380))
     w.add_widget(fb)
     fb.hide()
     fb_hidden = True
@@ -119,7 +111,7 @@ def init_nuipaint(w, *largs):
     
     @new_button.event
     def on_press(touch):
-        win  = MTPopup(label_submit="Create", title="New Canvas",size=(400, 350))
+        win  = MTPopup(label_submit="Create", title="New Canvas",size=(400, 350),pos=(10,100))
         win.add_widget(MTLabel(label="Width", font_size=14, bold=True))
         width_txt = MTTextInput(height=20,label="500")
         win.add_widget(width_txt)
@@ -141,7 +133,7 @@ def init_nuipaint(w, *largs):
         if fb_hidden:
             fb.show()            
         else:
-            fb = MTFileBrowser(pos=(100,400),size=(400,380))
+            fb = MTFileBrowser(pos=(new_button.width+30,100),size=(400,380))
             w.add_widget(fb)
 
         

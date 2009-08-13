@@ -45,7 +45,7 @@ void main()
 }
 """
 
-class specialScatterW(MTScatterWidget):
+"""class specialScatterW(MTScatterWidget):
     def __init__(self, **kwargs):
         super(specialScatterW, self).__init__(**kwargs)
     
@@ -70,8 +70,9 @@ class specialScatterW(MTScatterWidget):
         #self.bring_to_front()
         self.touches[touch.id] = Vector(x, y)
         return True
-        
-class AbstractLayer(specialScatterW):
+"""
+       
+class AbstractLayer(MTScatterWidget):
     def __init__(self, **kwargs):
         kwargs.setdefault('layer_manager', None)
         self.layer_manager = kwargs.get('layer_manager')        
@@ -184,6 +185,7 @@ class NormalLayer(AbstractLayer):
         #if self.need_redraw:
         #    self.clearfbo()
         #    self.need_redraw = False
+        
         if self.moveable == False :
             set_color(*self.bgcolor)
             drawRectangle((0,0),(self.width,self.height))

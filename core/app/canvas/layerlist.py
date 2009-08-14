@@ -154,7 +154,5 @@ class LayerManagerList(MTRectangularWidget):
             for item in self.list_items:
                 self.list_layout.remove_widget(item)
                 self.list_items.remove(item)
-        self.layer_manager.create_layer(pos=(0,0),size=(layer.width,layer.height))        
+        self.layer_manager.create_image_layer(pos=(0,0),size=(layer.width,layer.height),texture=layer.get_texture())        
         self.updateLayerList()
-        added_layer = (self.list_items[len(self.list_items)-1]).layer
-        added_layer.set_fbo_texture(layer.get_texture())

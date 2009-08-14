@@ -91,9 +91,6 @@ class AbstractLayer(MTScatterWidget):
         with self.fbo:
             drawTexturedRectangle(alt, pos=origin, size=(16, 16))
             
-    def set_fbo_texture(self,texture):
-        self.fbo.texture = texture
-         
 
 class NormalLayer(AbstractLayer):
     def __init__(self, **kwargs):
@@ -103,6 +100,7 @@ class NormalLayer(AbstractLayer):
             kwargs.setdefault('do_scale', False)
             kwargs.setdefault('do_rotation', False)
             kwargs.setdefault('do_translation', False)
+            kwargs.setdefault('auto_bring_to_front', False)
         super(NormalLayer, self).__init__(**kwargs)
         self.highlight =  False
 
@@ -126,16 +124,23 @@ class ImageLayer(AbstractLayer):
             kwargs.setdefault('do_rotation', False)
             kwargs.setdefault('do_translation', False)
         super(ImageLayer, self).__init__(**kwargs)
-        self.highlight =  False 
-        self.background = kwargs.get('file')
+        self.highlight =  False
+        if kwargs.get('file'):
+            self.background = kwargs.get('file')
+        else:
+            self.background = "brushes/brush_particle.png"
         img = pyglet.image.load(self.background)
         self.tex  = img.get_texture()
-        self.size = (img.width,img.height)
+        self.size = (self.width,self.height)
         with self.fbo:
             set_color(1, 1, 1, 1) 
             drawTexturedRectangle(self.tex, (0,0),(self.width,self.height))
   
-        
+    def set_new_fbo_image(self,texture):
+        with self.fbo:
+            set_color(1, 1, 1, 1)
+            drawTexturedRectangle(texture, (0,0),(self.width,self.height))
+    
     def draw(self):
         with gx_matrix:
             set_color(1, 1, 1, 1) 

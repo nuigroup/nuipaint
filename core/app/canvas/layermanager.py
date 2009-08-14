@@ -75,6 +75,13 @@ class LayerManager(MTScatterWidget):
         self.layer_counter += 1
         self.layer_list.append(layer)
         
+    def create_image_layer(self,pos=(0,0),size=(200,200),texture=None):
+        layer = ImageLayer(id=self.layer_counter,pos=pos,size=size,layer_manager=self)
+        self.add_widget(layer)
+        self.layer_counter += 1
+        self.layer_list.append(layer)
+        layer.set_new_fbo_image(texture)
+        
     def delete_layer(self,selected_layers):
         list = self.layer_list
         del_list = []

@@ -13,69 +13,83 @@ additional_css = '''
 
 '''
 css_add_sheet(additional_css)
-fb = None
-fb_hidden = True
 
 
 class FullScreenPaint(MTWidget):
     def __init__(self, **kwargs):
         super(FullScreenPaint,self).__init__(**kwargs)
+
         #Canvas
-        w = kwargs.get('window')
-        handler = kwargs.get('handler')
-        self.canvas = kwargs.get('canvas')
+        self.w = Observer.get('window')
+        self.handler = kwargs.get('handler')
+        self.canvas = Observer.get("canvas")
         self.add_widget(self.canvas) 
+        Observer.register("layer_manager",self.canvas.getListManager())
         
-        lm = LayerManagerList(pos=(w.width-200,w.height-300),layer_manager=self.canvas.getListManager(),cls=('roundedBorder'))
-        self.add_widget(lm)
+        self.lm = LayerManagerList(pos=(w.width-200,w.height-300),cls=('roundedBorder'))
+        self.add_widget(self.lm)
+        Observer.register("layer_manager_list",self.lm)
         
         #File Browser
-        fb = MTFileBrowser(pos=(100,400),size=(400,380))
-        self.add_widget(fb)
-        fb.hide()
+        self.fb = MTFileBrowser(pos=(100,400),size=(400,380))
+        self.add_widget(self.fb)
+        self.fb.hide()
+        Observer.register("file_browser",self.fb)
         
-        @fb.event
+        @self.fb.event
         def on_select(filelist):
             print filelist       
             
         #Bottom Toolbar
-        tb = toolbar(win=w,canvas=self.canvas)
-        self.add_widget(tb)    
+        self.tb = toolbar()
+        self.add_widget(self.tb)
+            
         #Top Toolbar
-        topb = topBar(win=w,canvas=self.canvas,filebrowser=fb,handler=handler)
-        self.add_widget(topb)
+        self.topb = topBar()
+        self.add_widget(self.topb)
         
         #Brush Resizer
-        br = MTBrushResizer(size=(100,100),canvas=self.canvas)
-        self.add_widget(br)
+        self.br = MTBrushResizer(size=(100,100))
+        self.add_widget(self.br)
         
         #Side Ciruclar Menu
-        cm = MTCircularMenu(pos=(-225,-225),radius=225,canvas=self.canvas)
-        self.add_widget(cm)
+        self.cm = MTCircularMenu(pos=(-225,-225),radius=225)
+        self.add_widget(self.cm)
         
         #Intialize Circular menu with brushes
         brush_list = []
         #by default generate a brushes list in circular menu        
         for brush in glob('brushes/*.png'):
-            brush_list.append([brush,br.set_brush,brush])
+            brush_list.append([brush,self.br.set_brush,brush])
             
-        cm.set_list(list=brush_list)
-
-        
+        self.cm.set_list(list=brush_list)        
           
-        cs = MTColorSelector(pos=(w.width-200,0),size=(200,200),win=w,canvas=self.canvas)
-        self.add_widget(cs)
+        self.cs = MTColorSelector(pos=(w.width-200,0),size=(200,200))
+        self.add_widget(self.cs)
         
     def set_canvas(self, canvas):
         self.canvas = canvas
+    
+    def register_to_observer(self):
+        Observer.register("window",self.w)
+        Observer.register("inner_window_handler",self.handler)
+        Observer.register("canvas",self.canvas)
+        Observer.register("layer_manager",self.canvas.getListManager())
+        Observer.register("layer_manager_list",self.lm)
+        Observer.register("file_browser",self.fb)
+        Observer.register("bottom_toolbar",self.tb)
+        Observer.register("top_toolbar",self.topb)
+        Observer.register("brush_resizer",self.br)
+        Observer.register("circular_menu",self.cm)
+        Observer.register("color_selector",self.cs)
 
 class WindowedPaint(MTWidget):
     def __init__(self, **kwargs):
         super(WindowedPaint, self).__init__(**kwargs)        
-        self.canvas = kwargs.get('canvas')
+        self.canvas = Observer.get('canvas')
         self.add_widget(self.canvas)
         #Bottom Toolbar
-        self.wb = windowBar(win=w,canvas=self.canvas, handler = kwargs.get('handler'))
+        self.wb = windowBar()
         self.add_widget(self.wb)
         
     def set_canvas(self, canvas):
@@ -86,21 +100,25 @@ class WindowedPaint(MTWidget):
 class NUIPaint(windowing):
     def __init__(self, **kwargs):
         super(NUIPaint, self).__init__(**kwargs)
-        self.win = kwargs.get('window')
+        self.win = Observer.get('window')
         
         if kwargs.get('file'):
             self.canvas = Canvas(size=(self.size[0],self.size[1]),pos=(0,0),cls=('roundedBorder'),background=kwargs.get('file'))
         else:
             self.canvas = Canvas(size=(self.size[0],self.size[1]),pos=(40,40),cls=('roundedBorder'))
+            
+        Observer.register("inner_window_handler",self)
+        Observer.register("canvas",self.canvas)
         
-        self.full_mode_painter = FullScreenPaint(window=self.win,canvas=self.canvas, handler = self)      
+        self.full_mode_painter = FullScreenPaint()      
         
-        self.windowed_mode_painter = WindowedPaint(window=self.win,canvas=self.canvas, handler = self)
+        self.windowed_mode_painter = WindowedPaint()
         self.add_widget(self.windowed_mode_painter)
         self.on_unfullscreen()
         
     def on_fullscreen(self):
         self.add_widget(self.full_mode_painter)
+        self.full_mode_painter.register_to_observer()
         self.canvas.enableTransformations()
         self.canvas.init_transform((self.win.width/2-self.canvas.width/2,self.win.height/2-self.canvas.height/2), 0, 1)
         self.windowed_mode_painter.wb.hide()
@@ -113,12 +131,15 @@ class NUIPaint(windowing):
         self.canvas.init_transform((-20,-20), 0, 1)
         self.remove_widget(self.full_mode_painter)
 
-def init_nuipaint(w, *largs): 
-    global fb,fb_hidden   
+def init_nuipaint(w, *largs):
+    Observer.register('window',w)
+    
+    clipboard = Clipboard()
+    Observer.register('clipboard',clipboard)
+    
     fb = MTFileBrowser(pos=(100,100),size=(400,380))
     w.add_widget(fb)
     fb.hide()
-    fb_hidden = True
     
     new_button = MTIconButton(pos=(10,10),icon_file="gfx/icons/new_L.png",label="New")
     w.add_widget(new_button)
@@ -135,7 +156,7 @@ def init_nuipaint(w, *largs):
         w.add_widget(win)
         @win.event
         def on_submit(*largs):
-            new_win = NUIPaint(window = w,pos=(200,200),size=(int(width_txt.get_label()),int(height_txt.get_label())),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.3,0.3,0.3),'bg-color-full':(0.3,0.3,0.3),'border-width':20})
+            new_win = NUIPaint(pos=(200,200),size=(int(width_txt.get_label()),int(height_txt.get_label())),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.3,0.3,0.3),'bg-color-full':(0.3,0.3,0.3),'border-width':20})
             w.add_widget(new_win)
     
     open_button = MTIconButton(pos=(new_button.width+30,10),icon_file="gfx/icons/open_L.png",label="Open")
@@ -143,23 +164,16 @@ def init_nuipaint(w, *largs):
     
     @open_button.event
     def on_press(touch):
-        global fb,fb_hidden
-        if fb_hidden:
-            fb.show()            
-        else:
-            fb = MTFileBrowser(pos=(new_button.width+30,100),size=(400,380))
-            w.add_widget(fb)
+        fb.show()            
 
         
     @fb.event
     def on_select(list):
-        global fb_hidden
         if len(list) == 0:
             return
         img = pyglet.image.load(list[0])
         open_window = NUIPaint(file=list[0],window = w,pos=(200,200),size=(img.width,img.height),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.3,0.3,0.3),'bg-color-full':(0.3,0.3,0.3),'border-width':20})
         w.add_widget(open_window)
-        fb_hidden = False
     
 if __name__ == '__main__':
     w = MTWindow()

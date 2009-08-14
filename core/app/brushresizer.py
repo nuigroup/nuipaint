@@ -1,13 +1,14 @@
 from __future__ import with_statement
 from pymt import *
 from pyglet.gl import *
+from core.app.observer import *
 
 
 class MTBrushResizer(MTWidget):
     def __init__(self, **kwargs):
         kwargs.setdefault('canvas', None)    
         super(MTBrushResizer, self).__init__(**kwargs)
-        self.canvas = kwargs.get('canvas')
+        self.canvas = Observer.get('canvas')
         self.bound  = MTStencilContainer(size=self.size)
         self.add_widget(self.bound)
         self.brush_image = MTScatterImage(filename="brushes/brush_particle.png",do_translation=False,do_rotation=False,scale_min=0.1)

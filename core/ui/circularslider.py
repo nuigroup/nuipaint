@@ -2,6 +2,7 @@ from __future__ import with_statement
 from pymt import *
 from pyglet.gl import *
 from math import degrees,sqrt,acos,pi,cos,sin,radians
+from core.app.observer import *
 
 def drawSemiCircle(pos=(0,0), inner_radius=100,outer_radius=100,slices=32,loops=1,start_angle=0,sweep_angle=0):
     gluPartialDisk(gluNewQuadric(), inner_radius, outer_radius, slices, loops, start_angle,sweep_angle )

@@ -2,6 +2,7 @@ from __future__ import with_statement
 from pymt import *
 from pyglet.gl import *
 from layermanager import *
+from core.app.observer import *
 
 class Canvas(MTScatterWidget):
     def __init__(self, **kwargs):
@@ -70,6 +71,12 @@ class Canvas(MTScatterWidget):
         self.do_scale       = True
         self.do_rotation    = True
         self.do_translation = True
+    
+    def get_fbo_texture(self):
+        with self.fbo:
+            set_color(1, 1, 1, .99) 
+            self.layer_manager.background.dispatch_event('on_draw')
+        return self.fbo.texture
 		
 if __name__ == '__main__':
     w = MTWindow()

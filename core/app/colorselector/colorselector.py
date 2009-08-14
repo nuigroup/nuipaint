@@ -4,6 +4,7 @@ from pyglet.gl import *
 from math import sin,cos,radians,sqrt
 from core.ui.circularslider import MTCircularSlider
 from colorsys import rgb_to_hsv,hsv_to_rgb
+from core.app.observer import *
 
        
 def drawPartialCircle(pos=(0,0), radius=100):
@@ -23,9 +24,9 @@ class MTColorSelector(MTWidget):
     def __init__(self, **kwargs):
         kwargs.setdefault('canvas', None)    
         super(MTColorSelector, self).__init__(**kwargs)
-        self.canvas = kwargs.get('canvas')
+        self.canvas = Observer.get('canvas')
         self.back_color = (0.0,0.0,0.0)
-        self.parent_win = kwargs.get('win')
+        self.parent_win = Observer.get('window')
         self.slider = MTCircularSlider(pos=(self.parent_win.width,0),radius=223,thickness=20,padding=2,sweep_angle=85,slider_color=(1,1,1,1),rotation=-87,min=0,max=2)
         self.add_widget(self.slider)
         self.slider.set_initial_value(value=50)

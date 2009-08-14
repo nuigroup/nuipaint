@@ -1,6 +1,7 @@
 from __future__ import with_statement
 from pymt import *
 from pyglet.gl import *
+from core.app.observer import *
 
 class toolbarHolder(MTGridLayout):
     def __init__(self, **kwargs):
@@ -31,8 +32,8 @@ class toolbarHolder(MTGridLayout):
 class toolbar(MTWidget):
     def __init__(self, **kwargs):
         super(toolbar, self).__init__(**kwargs)
-        self.canvas = kwargs.get('canvas')
-        self.parent_win = kwargs.get('win')
+        self.canvas = Observer.get('canvas')
+        self.parent_win = Observer.get('window')
         tb = toolbarHolder(size=(430,70))
         tb.pos = (int(self.parent_win.width/2-tb.width/2),-5)
         brush_icon = MTImageButton(filename='gfx/icons/brush white txt.png')

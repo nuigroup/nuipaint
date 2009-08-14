@@ -3,6 +3,7 @@ from pymt import *
 from pyglet.gl import *
 from math import cos,sin,radians,pi,degrees
 from glob import glob
+from core.app.observer import *
 
 class MTCircularItem(MTButton):
     def __init__(self, **kwargs):
@@ -49,7 +50,7 @@ class MTCircularItem(MTButton):
 class MTCircularMenu(MTWidget):
     def __init__(self, **kwargs):
         super(MTCircularMenu, self).__init__(**kwargs)
-        self.canvas = kwargs.get('canvas')
+        self.canvas = Observer.get('canvas')
         self.pos = kwargs.get('pos')
         self.radius = kwargs.get('radius')
        

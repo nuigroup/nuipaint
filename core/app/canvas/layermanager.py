@@ -2,6 +2,7 @@ from __future__ import with_statement
 from pymt import *
 from pyglet.gl import *
 from layer import *
+from core.app.observer import *
 
 class LayerManager(MTScatterWidget):
     def __init__(self, **kwargs):

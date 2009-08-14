@@ -1,6 +1,7 @@
 from __future__ import with_statement
 from pymt import *
 from pyglet.gl import *
+from core.app.observer import *
 
 class MTIconButton(MTButton):
     def __init__(self, **kwargs):

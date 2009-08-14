@@ -1,5 +1,6 @@
 from __future__ import with_statement
 from pymt import *
+from core.app.observer import *
 
 class layerItem(MTButton):
     def __init__(self, **kwargs):
@@ -70,7 +71,7 @@ class LayerManagerList(MTRectangularWidget):
         self.list_items = []
         self.selected_layers = []
         self.add_widget(self.list_layout)
-        self.layer_manager = kwargs.get('layer_manager')
+        self.layer_manager = Observer.get("layer_manager")
         self.layer_list = self.layer_manager.layer_list
 
         if len(self.layer_list) == 0:

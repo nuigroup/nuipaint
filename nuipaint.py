@@ -10,7 +10,6 @@ additional_css = '''
     border-radius: 20;
     border-radius-precision: .1;
 }
-
 '''
 css_add_sheet(additional_css)
 
@@ -152,12 +151,18 @@ def init_nuipaint(w, *largs):
     @new_button.event
     def on_press(touch):
         win  = MTPopup(label_submit="Create", title="New Canvas",size=(400, 350),pos=(10,100))
-        win.add_widget(MTLabel(label="Width", font_size=14, bold=True))
-        width_txt = MTTextInput(height=20,label="500")
-        win.add_widget(width_txt)
-        win.add_widget(MTLabel(label="Height", font_size=14, bold=True))
-        height_txt = MTTextInput(height=20,label="400")
-        win.add_widget(height_txt)
+        xml = XMLWidget(xml='''<?xml version="1.0"?>
+        <MTGridLayout cols="2" rows="2" spacing="2" padding="2">
+            <MTLabel label="'Width'" autoheight="True"/>
+            <MTTextInput id="'input_width'" label="'500'" height="30"/>
+            <MTLabel label="'Height'" autoheight="True"/>
+            <MTTextInput id="'input_height'" label="'400'" height="30"/>
+        </MTGridLayout>
+        ''')
+        win.add_widget(xml.children[0], True)
+        width_txt = getWidgetById('input_width')
+        height_txt = getWidgetById('input_height')
+
         w.add_widget(win)
         @win.event
         def on_submit(*largs):

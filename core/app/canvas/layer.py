@@ -10,7 +10,6 @@ def customPaintLine(*largs, **kwargs):
             GL_ONE, GL_ONE)
     paintLine(*largs, **kwargs)
     glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD)
-
        
 class AbstractLayer(MTScatterWidget):
     def __init__(self, **kwargs):
@@ -28,7 +27,7 @@ class AbstractLayer(MTScatterWidget):
         
         self.brush_fbo = Fbo(size=(16, 16), with_depthbuffer=False)
         self.smudge_region = None
-
+        self.ox,self.oy = 0,0
     def layer_clear(self):
         with self.fbo:
             glClearColor(0, 0, 0, 0)
@@ -91,6 +90,9 @@ class AbstractLayer(MTScatterWidget):
             alt = self.filter.circularblur(self.smudge_region,(16,16),0.5)        
         with self.fbo:
             drawTexturedRectangle(alt, pos=origin, size=(16, 16))
+            
+    def set_fbo_texture(self,texture):
+        self.fbo.texture = texture
          
 
 class NormalLayer(AbstractLayer):

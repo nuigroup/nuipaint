@@ -148,3 +148,13 @@ class LayerManagerList(MTRectangularWidget):
                 entry = layerEntry(id=layer.id,layer_text="Layer "+str(layer.id),layer_ptr=layer,layer_list=self)
                 self.list_layout.add_widget(entry)
                 self.list_items.append(entry)
+                
+    def paste_layer(self,layer):
+        if self.list_layout.pchildren[0].label == 'No Layers':
+            for item in self.list_items:
+                self.list_layout.remove_widget(item)
+                self.list_items.remove(item)
+        self.layer_manager.create_layer(pos=(0,0),size=(layer.width,layer.height))        
+        self.updateLayerList()
+        added_layer = (self.list_items[len(self.list_items)-1]).layer
+        added_layer.set_fbo_texture(layer.get_texture())

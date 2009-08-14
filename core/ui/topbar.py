@@ -49,5 +49,6 @@ class topBar(MTWidget):
             
         @paste_icon.event
         def on_press(touch):
-            print self.clipboard.get_data()
+            layer_list_manager = Observer.get("layer_manager_list")
+            layer_list_manager.paste_layer(self.clipboard.get_data())
             

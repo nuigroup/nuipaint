@@ -123,6 +123,7 @@ class ImageLayer(AbstractLayer):
             kwargs.setdefault('do_scale', False)
             kwargs.setdefault('do_rotation', False)
             kwargs.setdefault('do_translation', False)
+            kwargs.setdefault('auto_bring_to_front', False)
         super(ImageLayer, self).__init__(**kwargs)
         self.highlight =  False
         if kwargs.get('file'):

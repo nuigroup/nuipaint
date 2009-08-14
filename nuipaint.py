@@ -129,10 +129,11 @@ class NUIPaint(windowing):
         self.remove_widget(self.windowed_mode_painter)
                     
     def on_unfullscreen(self):
-        self.add_widget(self.windowed_mode_painter)
-        self.windowed_mode_painter.wb.show()
+        self.add_widget(self.windowed_mode_painter)        
         self.canvas.disableTransformations()
         self.canvas.init_transform((-20,-20), 0, 1)
+        self.windowed_mode_painter.wb.show()
+        self.windowed_mode_painter.wb.bring_to_front()
         self.remove_widget(self.full_mode_painter)
 
 def init_nuipaint(w, *largs):

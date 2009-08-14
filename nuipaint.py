@@ -37,8 +37,12 @@ class FullScreenPaint(MTWidget):
         Observer.register("file_browser",self.fb)
         
         @self.fb.event
-        def on_select(filelist):
-            print filelist       
+        def on_select(list):
+            if len(list) == 0:
+                return
+            img = pyglet.image.load(list[0])
+            new_canvas = Canvas(size=(img.width,img.height),pos=(0,0),cls=('roundedBorder'),background=list[0])
+            self.add_widget(new_canvas)       
             
         #Bottom Toolbar
         self.tb = toolbar()

@@ -23,6 +23,8 @@ class layerItem(MTButton):
         
     def on_press(self, touch) :
         touches = getAvailableTouchs()
+        if self.layer_text == 'No Layers':
+            return True
         if touch.is_double_tap:
             print  "Show layer options"
         else:
@@ -127,3 +129,22 @@ class LayerManagerList(MTRectangularWidget):
                 entry = layerEntry(id=layer.id,layer_text="Layer "+str(layer.id),layer_ptr=layer,layer_list=self)
             self.list_layout.add_widget(entry)
             self.list_items.append(entry)
+            
+    def set_new_list(self,layer_manager):
+        for item in self.list_items:
+            self.list_layout.remove_widget(item)
+            
+        self.list_items = []
+        self.selected_layers = []
+        self.layer_manager = layer_manager
+        self.layer_list = self.layer_manager.layer_list
+
+        if len(self.layer_list) == 0:
+            entry = layerEntry(layer_text='No Layers')
+            self.list_layout.add_widget(entry)
+            self.list_items.append(entry)
+        else:
+            for layer in self.layer_list:
+                entry = layerEntry(id=layer.id,layer_text="Layer "+str(layer.id),layer_ptr=layer,layer_list=self)
+                self.list_layout.add_widget(entry)
+                self.list_items.append(entry)

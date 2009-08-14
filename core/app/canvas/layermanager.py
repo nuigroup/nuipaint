@@ -86,3 +86,6 @@ class LayerManager(MTScatterWidget):
             self.layer_list.remove(ele)
             self.remove_widget(ele)
         del_list = []
+        
+    def set_canvas(self,canvas):
+        self.canvas = canvas

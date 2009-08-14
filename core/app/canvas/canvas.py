@@ -77,6 +77,22 @@ class Canvas(MTScatterWidget):
             set_color(1, 1, 1, .99) 
             self.layer_manager.background.dispatch_event('on_draw')
         return self.fbo.texture
+    
+    def on_touch_down(self,touch):
+        if self.collide_point(touch.x,touch.y):
+            if Observer.get('canvas') != self:
+                Observer.register('canvas',self)
+                Observer.register('layer_manager',self.layer_manager)
+                self.reset_all_canvas_deps()
+                Observer.get("layer_manager_list").set_new_list(self.layer_manager)
+            super(Canvas, self).on_touch_down(touch)
+            
+    def reset_all_canvas_deps(self):
+        Observer.get("bottom_toolbar").canvas = self
+        Observer.get("top_toolbar").canvas = self
+        Observer.get("brush_resizer").canvas = self
+        Observer.get("circular_menu").canvas = self
+        Observer.get("color_selector").canvas = self
 		
 if __name__ == '__main__':
     w = MTWindow()

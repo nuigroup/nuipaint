@@ -3,74 +3,6 @@ from pymt import *
 from pyglet.gl import *
 from filters import *
 
-vertex_shader_src = """
-void main()
-{
-   gl_TexCoord[0] = gl_MultiTexCoord0;
-   //gl_TexCoord[1] = gl_MultiTexCoord1;
-   gl_Position = ftransform();
-}
-"""
-
-fragment2_shader_src = """
-uniform sampler2D last_spot;
-void main()
-{
-   vec4 col = texture2D(last_spot, gl_TexCoord[0].st);
-   float or,og,ob,r,g,b,x,y;
-   x = gl_TexCoord[0].s;
-   y = gl_TexCoord[0].t;
-   float rate = 0.5;
-   or = col.r;
-   og = col.g;
-   ob = col.b;
-   r = rate * or + (1.0 - rate) * or;
-   g = rate * og + (1.0 - rate) * og;
-   b = rate * ob + (1.0 - rate) * ob;
-   vec4 finalColor = vec4(r,g,b,1.0);
-   if (x < 0.5) {
-        //vec4 finalColor = vec4(r,g,b,1.0);
-   } else {
-        vec4 finalColor = vec4(1.0,0.0,0.0,1.0);
-   }
-   
-   /*
-   float cv = 0.5;
-   vec4 color0 = texture2D(last_spot, gl_TexCoord[0].st);  
-   vec4 color1 = texture2D(last_spot, gl_TexCoord[1].st);
-   vec4 color = vec4(color0 * cv + color1 * (1 - cv));
-   */
-   
-   gl_FragColor = mix(gl_FragColor, finalColor, 1.0);
-}
-"""
-
-"""class specialScatterW(MTScatterWidget):
-    def __init__(self, **kwargs):
-        super(specialScatterW, self).__init__(**kwargs)
-    
-    def on_touch_down(self, touch):
-        x, y = touch.x, touch.y
-
-        # if the touch isnt on the widget we do nothing
-        if not self.collide_point(x, y):
-            return False
-
-        # let the child widgets handle the event if they want
-        touch.push()
-        touch.x, touch.y = self.to_local(x, y)
-        if super(MTScatterWidget, self).on_touch_down(touch):
-            touch.pop()
-            return True
-        touch.pop()
-
-        # if the children didnt handle it, we bring to front & keep track
-        # of touches for rotate/scale/zoom action
-        touch.grab(self)
-        #self.bring_to_front()
-        self.touches[touch.id] = Vector(x, y)
-        return True
-"""
        
 class AbstractLayer(MTScatterWidget):
     def __init__(self, **kwargs):
@@ -85,16 +17,19 @@ class AbstractLayer(MTScatterWidget):
         #self.smudge_shader = Shader(vertex_shader_src, fragment_shader_src)
         self.temp_tex = None
         self.filter = Filter()
+        
+        self.brush_fbo = Fbo(size=(16, 16), with_depthbuffer=False)
+        self.smudge_region = None
 
     def layer_clear(self):
         with self.fbo:
             if self.moveable == False :
                 glClearColor(1,1,1,1)
             else:
-                glClearColor(*self.color)
+                glClearColor(1,1,1,1)
             glClear(GL_COLOR_BUFFER_BIT)
             glClearColor(1,1,1,1)
-            set_color(self.bgcolor)
+            set_color(1,1,1,1)
             drawRectangle((0,0),(self.width,self.height))
 
     def on_touch_down(self, touch):
@@ -128,6 +63,7 @@ class AbstractLayer(MTScatterWidget):
                     set_brush(self.layer_manager.brush_sprite,self.layer_manager.brush_size)
                     paintLine((ox,oy,cur_pos[0],cur_pos[1]))                    
             elif self.layer_manager.mode == "smudge":
+                self.set_brush_fbo(self.to_local(touch.x,touch.y))
                 self.smudge(self.to_local(touch.x,touch.y))
                 self.temp_tex = self.settemptex(self.to_local(touch.x,touch.y))
             return True
@@ -139,20 +75,17 @@ class AbstractLayer(MTScatterWidget):
         x,y = map(int,origin)
         return self.fbo.texture.get_region(x - 16, y - 16, 3, 32)
         
-    def smudge(self, origin, location=(0,0)):
+    def set_brush_fbo(self, origin, location=(0,0)):
         x,y = map(int,origin)
-        region = self.fbo.texture.get_region(x - 8, y - 8, 16, 16)
-        alt = self.filter.blur(region,(16,16),0.5)
+        self.smudge_region = self.fbo.texture.get_region(x - 8, y - 8, 16, 16)
+        with self.brush_fbo:
+            drawTexturedRectangle(self.smudge_region, pos=origin, size=(32, 32))
         
+    def smudge(self, origin, location=(0,0)):
+        with self.brush_fbo:
+            alt = self.filter.circularblur(self.smudge_region,(16,16),0.5)        
         with self.fbo:
-            #self.smudge_shader.use()
-            #self.smudge_shader['size_x'] = 32
-            #self.smudge_shader['size_y'] = 32
-            #self.smudge_shader['kernel_size'] = 3.0
-            #self.smudge_shader['direction'] = 0.0
-            #drawTexturedRectangle(self.temp_tex, pos=origin, size=(32, 32))
-            drawTexturedRectangle(alt, pos=origin, size=(32, 32))
-            #self.smudge_shader.stop()
+            drawTexturedRectangle(alt, pos=origin, size=(16, 16))
          
 
 class NormalLayer(AbstractLayer):
@@ -165,7 +98,6 @@ class NormalLayer(AbstractLayer):
             kwargs.setdefault('do_translation', False)
         super(NormalLayer, self).__init__(**kwargs)
         self.highlight =  False
-        #self.need_redraw = True        
 
     def clearfbo(self):
         with self.fbo:
@@ -173,20 +105,15 @@ class NormalLayer(AbstractLayer):
             drawRectangle(pos=(0,0),size=(self.width,self.height))
         
     def draw(self):
-        #glColor4f(*self.color)
-        #if self.need_redraw:
-        #    self.clearfbo()
-        #    self.need_redraw = False
-        
         if self.moveable == False :
-            set_color(*self.bgcolor)
-            drawRectangle((0,0),(self.width,self.height))
+            set_color(1,1,1,0.99)
+            #drawRectangle((0,0),(self.width,self.height))
             drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))
         else:
-            set_color(*self.bgcolor)
+            set_color(1,1,1,0.99)
             drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))
             if self.highlight == True :
-                set_color(0,0,1,0.2)
+                set_color(0,0,1,0.5)
                 drawRectangle((0,0),(self.width,self.height))                    
 
 class ImageLayer(AbstractLayer):

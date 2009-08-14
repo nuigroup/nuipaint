@@ -1,5 +1,6 @@
 from __future__ import with_statement
 from pymt import *
+from pyglet.image import *
 from pyglet.gl import *
 from layermanager import *
 from core.app.observer import *
@@ -33,16 +34,54 @@ class Canvas(MTScatterWidget):
 
     def create_layer(self,pos=(0,0),size=(200,200)):
         self.layer_manager.create_layer(pos=pos,size=size)
+
+    def get_image_data(self, ptexture):
+        format = 'RGB'
+        gl_format = GL_RGB
+
+        if type(ptexture) == TextureRegion:
+            texture = ptexture.owner
+            z = ptexture.z
+        else:
+            texture = ptexture
+            z = 0
+
+        print texture.target, texture.id
+        print texture.images, texture.width, texture.height
+        glBindTexture(texture.target, texture.id)
+        glPushClientAttrib(GL_CLIENT_PIXEL_STORE_BIT)
+        glPixelStorei(GL_PACK_ALIGNMENT, 1)
+        buffer = \
+            (GLubyte * (texture.width * texture.height * texture.images * len(format)))()
+        print buffer
+        glGetTexImage(texture.target, texture.level, 
+                      gl_format, GL_UNSIGNED_BYTE, buffer)
+        glPopClientAttrib()
+        print 'buffer', buffer
+
+        data = ImageData(texture.width, texture.height, format, buffer)
+        print data
+        if texture.images > 1:
+            data = data.get_region(0, z * texture.height, texture.width, texture.height)
+        if ptexture != texture:
+            return data.get_region(ptexture.x, ptexture.y, ptexture.width, ptexture.height)
+        return data
         
     def save_image(self):
         with self.fbo:
-            set_color(1, 1, 1, .99) 
+            bgcolor = list(self.layer_manager.background.bgcolor)[:3] + [1]
+            glClearColor(*bgcolor)
+            glClear(GL_COLOR_BUFFER_BIT)
+            set_color(1, 1, 1, 1)
+            glEnable(GL_BLEND)
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
             self.layer_manager.background.dispatch_event('on_draw')
             for layer in self.layer_manager.layer_list :
-                set_color(1, 1, 1, .99) 
                 layer.dispatch_event('on_draw')
             
-        data = (self.fbo.texture).get_image_data()
+        data = self.get_image_data(self.fbo.texture)
+        #data = self.get_image_data(self.layer_manager.background.fbo.texture)
         data.save(file='test.png')
         
     def set_brush_color(self,color):

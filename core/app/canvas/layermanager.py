@@ -86,6 +86,13 @@ class LayerManager(MTScatterWidget):
             self.layer_list.remove(ele)
             self.remove_widget(ele)
         del_list = []
-        
+
+    def draw(self):
+        set_color(*self.background.bgcolor)
+        drawRectangle(size=self.background.size)
+        set_color(1, 1, 1, 1)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+ 
     def set_canvas(self,canvas):
         self.canvas = canvas

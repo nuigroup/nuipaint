@@ -4,6 +4,13 @@ from pyglet.gl import *
 from filters import *
 from core.app.observer import *
 
+def customPaintLine(*largs, **kwargs):
+    glBlendEquationSeparate(GL_FUNC_ADD, GL_MAX)
+    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA,
+            GL_ONE, GL_ONE)
+    paintLine(*largs, **kwargs)
+    glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD)
+
        
 class AbstractLayer(MTScatterWidget):
     def __init__(self, **kwargs):
@@ -24,14 +31,8 @@ class AbstractLayer(MTScatterWidget):
 
     def layer_clear(self):
         with self.fbo:
-            if self.moveable == False :
-                glClearColor(1,1,1,1)
-            else:
-                glClearColor(1,1,1,1)
+            glClearColor(0, 0, 0, 0)
             glClear(GL_COLOR_BUFFER_BIT)
-            glClearColor(1,1,1,1)
-            set_color(1,1,1,1)
-            drawRectangle((0,0),(self.width,self.height))
 
     def on_touch_down(self, touch):
         if self.collide_point(touch.x,touch.y): 
@@ -42,10 +43,11 @@ class AbstractLayer(MTScatterWidget):
             elif touch.is_double_tap:
                self.layer_manager.move_layer_up(self.id)
             if self.layer_manager.mode == "draw":
+                self.ox,self.oy = touch.x,touch.y
                 with self.fbo:
                     set_color(*self.layer_manager.brush_color)
                     set_brush(self.layer_manager.brush_sprite,self.layer_manager.brush_size)
-                    paintLine((touch.x,touch.y,touch.x+1,touch.y+1))                    
+                    customPaintLine((touch.x,touch.y,touch.x+1,touch.y+1), numsteps=1)
             elif self.layer_manager.mode == "zoom":
                 super(AbstractLayer, self).on_touch_down(touch)
             elif self.layer_manager.mode == "smudge":
@@ -58,11 +60,13 @@ class AbstractLayer(MTScatterWidget):
                 super(AbstractLayer, self).on_touch_move(touch)
             elif self.layer_manager.mode == "draw":
                 cur_pos = self.to_local(touch.x,touch.y)
-                ox,oy = self.to_local(touch.x,touch.y)
+                ox, oy = self.ox, self.oy
                 with self.fbo:
                     set_color(*self.layer_manager.brush_color)
                     set_brush(self.layer_manager.brush_sprite,self.layer_manager.brush_size)
-                    paintLine((ox,oy,cur_pos[0],cur_pos[1]))                    
+                    numsteps = Vector(ox, oy).distance(Vector(cur_pos[0], cur_pos[1]))
+                    customPaintLine((ox,oy,cur_pos[0],cur_pos[1]), numsteps=int(numsteps))
+                self.ox,self.oy = cur_pos
             elif self.layer_manager.mode == "smudge":
                 self.set_brush_fbo(self.to_local(touch.x,touch.y))
                 self.smudge(self.to_local(touch.x,touch.y))
@@ -106,16 +110,10 @@ class NormalLayer(AbstractLayer):
             drawRectangle(pos=(0,0),size=(self.width,self.height))
         
     def draw(self):
-        if self.moveable == False :
-            set_color(1,1,1,0.99)
-            #drawRectangle((0,0),(self.width,self.height))
-            drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))
-        else:
-            set_color(1,1,1,0.99)
-            drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))
-            if self.highlight == True :
-                set_color(0,0,1,0.5)
-                drawRectangle((0,0),(self.width,self.height))                    
+        drawTexturedRectangle(texture=self.fbo.texture, size=self.size)
+        if self.moveable and self.highlight:
+            set_color(0,0,1,0.5)
+            drawRectangle(size=self.size)
 
 class ImageLayer(AbstractLayer):
     def __init__(self, **kwargs):
@@ -140,4 +138,3 @@ class ImageLayer(AbstractLayer):
         with gx_matrix:
             set_color(1, 1, 1, 1) 
             drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))
- 

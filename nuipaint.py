@@ -45,9 +45,23 @@ class FullScreenPaint(MTWidget):
         topb = topBar(win=w,canvas=self.canvas,filebrowser=fb,handler=handler)
         self.add_widget(topb)
         
+        #Brush Resizer
+        br = MTBrushResizer(size=(100,100),canvas=self.canvas)
+        self.add_widget(br)
+        
         #Side Ciruclar Menu
         cm = MTCircularMenu(pos=(-225,-225),radius=225,canvas=self.canvas)
-        self.add_widget(cm)   
+        self.add_widget(cm)
+        
+        #Intialize Circular menu with brushes
+        brush_list = []
+        #by default generate a brushes list in circular menu        
+        for brush in glob('brushes/*.png'):
+            brush_list.append([brush,br.set_brush,brush])
+            
+        cm.set_list(list=brush_list)
+
+        
           
         cs = MTColorSelector(pos=(w.width-200,0),size=(200,200),win=w,canvas=self.canvas)
         self.add_widget(cs)

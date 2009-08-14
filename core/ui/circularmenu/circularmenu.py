@@ -28,7 +28,7 @@ class MTCircularItem(MTButton):
             return True
         
     def on_press(self, touch):
-        self.action_handler(sprite=self.action_value,size=64)
+        self.action_handler(brush_image=self.action_value,brush_size=64)
         
     def _get_filename(self):
         return self._filename
@@ -57,15 +57,6 @@ class MTCircularMenu(MTWidget):
         self.circular_menu_render = MTCircularMenu_Render(pos=self.pos,radius=self.radius)
         kt.add_widget(self.circular_menu_render)
         self.add_widget(kt)        
-        
-                
-        brush_list = []
-        #by default generate a brushes list in circular menu        
-        for brush in glob('brushes/*.png'):
-            brush_list.append([brush,self.canvas.set_brush,brush])
-            
-        self.set_list(list=brush_list)
-        
         
     def set_list(self,list):
         for item in list:

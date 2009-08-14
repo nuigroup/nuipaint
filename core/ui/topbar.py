@@ -16,14 +16,14 @@ class topBar(MTWidget):
         tb.add_widget(save_icon)
         open_icon = MTIconButton(icon_file='gfx/icons/fileopen.png',label="Open")
         tb.add_widget(open_icon)
-        undo_icon = MTIconButton(icon_file='gfx/icons/undo.png',label="Undo")
-        tb.add_widget(undo_icon)
-        redo_icon = MTIconButton(icon_file='gfx/icons/redo.png',label="Redo")
-        tb.add_widget(redo_icon)
+        #undo_icon = MTIconButton(icon_file='gfx/icons/undo.png',label="Undo")
+        #tb.add_widget(undo_icon)
+        #redo_icon = MTIconButton(icon_file='gfx/icons/redo.png',label="Redo")
+        #tb.add_widget(redo_icon)
         fullscreen_icon = MTIconButton(icon_file='gfx/icons/unfullscreen.png',label="MiniMode")
         tb.add_widget(fullscreen_icon)
         self.add_widget(tb)
-        tb.size = (tb._get_content_width()-45,tb.height)
+        tb.size = (tb._get_content_width()-75,tb.height)
         
         @open_icon.event
         def on_press(touch):

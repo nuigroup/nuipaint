@@ -42,7 +42,7 @@ class MTColorSelector(MTWidget):
                 s = self.slider._value
             else:
                 v = 2-self.slider._value
-            self.canvas.set_brush_color(hsv_to_rgb(h,s,v))
+            Observer.get('canvas').set_brush_color(hsv_to_rgb(h,s,v))
             self.slider.slider_color = hsv_to_rgb(h,s,v)
 
 
@@ -104,4 +104,4 @@ class MTColorCircle(MTWidget):
         self.parent.set_slider_data(color=(r,g,b),value=50)
 
         if(self.canvas):
-            self.canvas.set_brush_color((r,g,b))        
+            Observer.get('canvas').set_brush_color((r,g,b))        

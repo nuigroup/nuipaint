@@ -1,6 +1,7 @@
 from __future__ import with_statement
 from pymt import *
 from core.app.observer import *
+from pyglet.gl import *
 
 class layerItem(MTButton):
     def __init__(self, **kwargs):
@@ -111,8 +112,39 @@ class LayerManagerList(MTRectangularWidget):
                 self.list_layout.add_widget(entry)
                 self.list_items.append(entry)
         
-        resize = MTButton(label="Resize",pos=(self.pos[0]+135,self.pos[1]+10),size=(55,30),cls=('simple', 'colored'))
-        self.add_widget(resize)
+        merge = MTButton(label="Merge",pos=(self.pos[0]+135,self.pos[1]+10),size=(55,30),cls=('simple', 'colored'))
+        self.add_widget(merge)
+        @merge.event    
+        def on_press(touch):
+            if len(self.selected_layers) == 0:
+                #create the merged layers
+                canvas = Observer.get('canvas')
+                merge_fbo = Fbo(size=canvas.size, with_depthbuffer=False)
+                merge_fbo.texture = canvas.current_canvas_view()                
+                #delete all existing layers
+                for layer_item in self.layer_list:
+                    self.selected_layers.append(layer_item.id)
+                self.layer_manager.delete_layer(self.selected_layers)
+                #clear background layers fbo and paste merged layer
+                self.layer_manager.background.layer_clear()
+                self.layer_manager.background.fbo.texture = merge_fbo.texture
+                #reset all list and update the layerlist
+                self.layer_manager.layer_list = []
+                self.selected_layers = []
+                self.updateLayerList()
+            else:
+                #create the merged layers
+                canvas = Observer.get('canvas')
+                merge_fbo = Fbo(size=canvas.size, with_depthbuffer=False)                
+                with merge_fbo:
+                    set_color(1, 1, 1, 1)
+                    glEnable(GL_BLEND)
+                    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+                    for layer in self.layer_manager.layer_list :
+                        layer.dispatch_event('on_draw')
+                self.layer_manager.delete_layer(self.selected_layers)
+                self.selected_layers = []
+                self.paste_layer(merge_fbo.texture)
         
     def updateLayerList(self):
         for item in self.list_items:
@@ -121,7 +153,7 @@ class LayerManagerList(MTRectangularWidget):
         self.list_items = []
         
         self.layer_list = self.layer_manager.getLayerList()
-
+        
         for layer in self.layer_list:
             if layer.id in self.selected_layers:
                 entry = layerEntry(id=layer.id,layer_text="Layer "+str(layer.id),layer_ptr=layer,layer_list=self,color=(1.0,0.4,0))
@@ -129,6 +161,12 @@ class LayerManagerList(MTRectangularWidget):
                 entry = layerEntry(id=layer.id,layer_text="Layer "+str(layer.id),layer_ptr=layer,layer_list=self)
             self.list_layout.add_widget(entry)
             self.list_items.append(entry)
+            
+        if len(self.layer_list) == 0:
+            entry = layerEntry(layer_text='No Layers')
+            self.list_layout.add_widget(entry)
+            self.list_items.append(entry)
+            return
             
     def set_new_list(self,layer_manager):
         for item in self.list_items:

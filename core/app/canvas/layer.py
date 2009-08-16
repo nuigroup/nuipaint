@@ -143,6 +143,7 @@ class ImageLayer(AbstractLayer):
             drawTexturedRectangle(texture, (0,0),(self.width,self.height))
     
     def draw(self):
-        with gx_matrix:
-            set_color(1, 1, 1, 1) 
-            drawTexturedRectangle(self.fbo.texture, (0,0),(self.width,self.height))
+        drawTexturedRectangle(texture=self.fbo.texture, size=self.size)
+        if self.moveable and self.highlight:
+            set_color(0,0,1,0.5)
+            drawRectangle(size=self.size)

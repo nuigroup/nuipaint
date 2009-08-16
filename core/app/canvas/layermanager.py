@@ -103,3 +103,4 @@ class LayerManager(MTScatterWidget):
  
     def set_canvas(self,canvas):
         self.canvas = canvas
+        

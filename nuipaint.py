@@ -84,6 +84,7 @@ class FullScreenPaint(MTWidget):
         Observer.register("circular_menu",self.cm)
         Observer.register("color_selector",self.cs)
 
+
 class WindowedPaint(MTWidget):
     def __init__(self, **kwargs):
         super(WindowedPaint, self).__init__(**kwargs)        
@@ -95,7 +96,7 @@ class WindowedPaint(MTWidget):
         
     def set_canvas(self, canvas):
         self.canvas = canvas
-   
+
         
 #The most abstract class holding each interaction widget
 class NUIPaint(windowing):

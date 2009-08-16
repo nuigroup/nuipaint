@@ -4,10 +4,51 @@ from pyglet.image import *
 from pyglet.gl import *
 from layermanager import *
 from core.app.observer import *
+from os.path import join
 
+class CanvasButtons(MTWidget):
+    def __init__(self, **kwargs):
+        super(CanvasButtons, self).__init__(**kwargs)
+
+        self.toolbar_grid = MTBoxLayout(pos=(self.pos[0]+10,self.pos[1]+25),spacing=5)
+        self.add_widget(self.toolbar_grid)
+        
+        close_button = MTImageButton(filename=os.path.join("gfx","icons","close_small.png"))
+        self.toolbar_grid.add_widget(close_button)
+        
+        #work_area_button = MTImageButton(filename=os.path.join("gfx","icons","minimize_small.png"))
+        #self.toolbar_grid.add_widget(work_area_button)
+        
+        self.size = (self.toolbar_grid._get_content_width()+30,self.toolbar_grid._get_content_height()+30)
+        
+        """@work_area_button.event
+        def on_release(*largs):
+            ob = Observer.get('canvas')
+            if not ob.work_area_hidden:
+                work_area_button._set_filename(filename=os.path.join("gfx","icons","maximize_small.png"))
+                ob.hide_work_area()
+            else:
+                work_area_button._set_filename(filename=os.path.join("gfx","icons","minimize_small.png"))
+                ob.show_work_area()
+        """
+        
+        @close_button.event
+        def on_press(*largs):
+            self.parent.hide()
+        
+    def draw(self):
+        set_color(0.3,0.3,0.3,1.0)
+        drawCSSRectangle(size=self.size,pos=self.pos,style={'border-radius': 10,'border-radius-precision': .1})
+        self.toolbar_grid.dispatch_event('on_draw')
+        
 class Canvas(MTScatterWidget):
     def __init__(self, **kwargs):
-        super(Canvas, self).__init__(**kwargs)        
+        super(Canvas, self).__init__(**kwargs)
+        self.auto_bring_to_front = True
+               
+        self.buttons = CanvasButtons(pos=(0,self.height))
+        self.add_widget(self.buttons)
+        
         if kwargs.get('background'):
             self.back_image = pyglet.image.load(kwargs.get('background'))
             self.size = (self.back_image.width,self.back_image.height)
@@ -22,7 +63,10 @@ class Canvas(MTScatterWidget):
         self.fbo = Fbo(size=(self.width, self.height), with_depthbuffer=False)
         self.canvas_size = kwargs.get('size')
         self.size = (self.canvas_size[0]+40,self.canvas_size[1]+40)
-
+        
+        self.work_area_hidden = False
+        self.prev_size = self.size
+        self.prev_pos = self.pos
 		
     def draw(self):
         with gx_matrix:
@@ -83,6 +127,22 @@ class Canvas(MTScatterWidget):
         data = self.get_image_data(self.fbo.texture)
         #data = self.get_image_data(self.layer_manager.background.fbo.texture)
         data.save(file='test.png')
+    
+    def current_canvas_view(self):
+        with self.fbo:
+            bgcolor = list(self.layer_manager.background.bgcolor)[:3] + [1]
+            glClearColor(*bgcolor)
+            glClear(GL_COLOR_BUFFER_BIT)
+            set_color(1, 1, 1, 1)
+            glEnable(GL_BLEND)
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+            self.layer_manager.background.dispatch_event('on_draw')
+            for layer in self.layer_manager.layer_list :
+                layer.dispatch_event('on_draw')
+                
+        return self.fbo.texture
+        
         
     def set_brush_color(self,color):
         self.layer_manager.set_brush_color(color)
@@ -137,6 +197,28 @@ class Canvas(MTScatterWidget):
         Observer.get("brush_resizer").canvas = self
         Observer.get("circular_menu").canvas = self
         Observer.get("color_selector").canvas = self
+        
+    def hide_work_area(self):
+        self.work_area_hidden = True
+        for child in self.children:
+            if child == self.buttons:
+                continue
+            child.hide()
+        self.prev_size = self.size
+        self.prev_pos = self.pos
+        self.size = (self.size[0],60)
+        self.pos = (self.prev_pos[0],self.prev_pos[1]+self.prev_size[1])
+        
+    def show_work_area(self):
+        self.work_area_hidden = False
+        for child in self.children:
+            if child == self.buttons:
+                continue
+            child.show()
+        self.size = self.prev_size
+        
+    def close(self):
+        self.parent.remove_widget(self)
 		
 if __name__ == '__main__':
     w = MTWindow()

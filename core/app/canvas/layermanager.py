@@ -104,3 +104,9 @@ class LayerManager(MTScatterWidget):
     def set_canvas(self,canvas):
         self.canvas = canvas
         
+    def set_background(self,texture):
+        self.background.fbo.texture = texture
+        
+    def get_background(self):
+        return self.background.fbo.texture
+        

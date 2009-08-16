@@ -58,7 +58,13 @@ class toolbar(MTWidget):
             
         @filter_icon.event
         def on_press(touch):
-            self.canvas.set_mode("smudge")   
-         
+            filterbox = Observer.get('filter_box')
+            filterbox.show()
+            
+        @filter_icon.event
+        def on_release(touch):
+            filterbox = Observer.get('filter_box')
+            filterbox.hide()
+        
         
             

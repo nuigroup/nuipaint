@@ -49,6 +49,7 @@ class FullScreenPaint(MTWidget):
         self.topb = topBar()
         self.add_widget(self.topb)
         
+        
         #Brush Resizer
         self.br = MTBrushResizer(size=(100,100))
         self.add_widget(self.br)
@@ -64,7 +65,12 @@ class FullScreenPaint(MTWidget):
             brush_list.append([brush,self.br.set_brush,brush])
             
         self.cm.set_list(list=brush_list)        
-          
+        
+        
+        self.filterbox = FilterBox(pos = (self.w.width/2-30,75))
+        self.add_widget(self.filterbox)
+        self.filterbox.hide()
+        
         self.cs = MTColorSelector(pos=(w.width-200,0),size=(200,200))
         self.add_widget(self.cs)
         
@@ -83,6 +89,7 @@ class FullScreenPaint(MTWidget):
         Observer.register("brush_resizer",self.br)
         Observer.register("circular_menu",self.cm)
         Observer.register("color_selector",self.cs)
+        Observer.register("filter_box",self.filterbox)
 
 
 class WindowedPaint(MTWidget):

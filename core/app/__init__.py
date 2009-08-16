@@ -3,3 +3,4 @@ from colorselector import *
 from brushresizer import *
 from clipboard import *
 from observer import *
+from filterbox import *

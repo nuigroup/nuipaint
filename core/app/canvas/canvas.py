@@ -67,6 +67,8 @@ class Canvas(MTScatterWidget):
         self.work_area_hidden = False
         self.prev_size = self.size
         self.prev_pos = self.pos
+        self.current_view = self.current_canvas_view()
+        Observer.register('last_saved_background_view',self.current_view)
 		
     def draw(self):
         with gx_matrix:
@@ -184,14 +186,15 @@ class Canvas(MTScatterWidget):
     
     def on_touch_down(self,touch):
         if self.collide_point(touch.x,touch.y):
-            if Observer.get('canvas') != self:
-                Observer.register('canvas',self)
-                Observer.register('layer_manager',self.layer_manager)
-                self.reset_all_canvas_deps()
-                Observer.get("layer_manager_list").set_new_list(self.layer_manager)
+            Observer.register('canvas',self)
+            Observer.register('layer_manager',self.layer_manager)
+            self.reset_all_canvas_deps()
+            Observer.get("layer_manager_list").set_new_list(self.layer_manager)
+            self.current_view = self.current_canvas_view()
+            Observer.register('last_saved_background_view',self.current_view)
             super(Canvas, self).on_touch_down(touch)
             
-    def reset_all_canvas_deps(self):
+    def reset_all_canvas_deps(self):        
         Observer.get("bottom_toolbar").canvas = self
         Observer.get("top_toolbar").canvas = self
         Observer.get("brush_resizer").canvas = self

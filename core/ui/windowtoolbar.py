@@ -10,7 +10,7 @@ class windowBar(MTWidget):
         super(windowBar, self).__init__(**kwargs)
         self.canvas = Observer.get('canvas')
         self.handler = Observer.get("inner_window_handler")
-        tb = toolbarHolder(size=(20,44),spacing=10)
+        tb = toolbarHolder(spacing=10,padding=0)
         color = MTImageButton(filename='gfx/icons/color.png')
         tb.add_widget(color)
         brush = MTImageButton(filename='gfx/icons/brush.png')
@@ -18,7 +18,7 @@ class windowBar(MTWidget):
         save = MTImageButton(filename='gfx/icons/filesave_tiny.png')
         tb.add_widget(save)
         self.add_widget(tb)
-        tb.size = (tb._get_content_width()-65,tb.height)
+        #tb.size = (100,tb.height)
         tb.pos = (int(self.handler.size[0]/2-tb.size[0]/2), -5)
         
         self.tinycolor = MTTinyColorPicker(pos=(color.pos[0]-45,color.pos[1]+35))

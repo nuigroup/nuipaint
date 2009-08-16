@@ -53,9 +53,10 @@ class Filter:
         if self.current_texture != texture :    
             self.current_texture = texture
             self.fbo = Fbo(size=texture_size, with_depthbuffer=False)
-            
+         
+        first_pass_fbo = Fbo(size=texture_size, with_depthbuffer=False)
         #horizontal pass
-        with self.fbo:
+        with first_pass_fbo:
             self.shader.use()
             #self.shader['value'] = value
             self.shader['size_x'] = float(texture_size[0])
@@ -77,7 +78,7 @@ class Filter:
             self.shader['direction'] = 1.0
             self.shader['value'] = value
             set_color(1, 1, 1)
-            drawTexturedRectangle(self.fbo.texture, size=self.fbo.size)
+            drawTexturedRectangle(first_pass_fbo.texture, size=self.fbo.size)
             self.shader.stop()
             
         return self.fbo.texture
@@ -406,22 +407,16 @@ class Filter:
                             color += texture2D (tex, st + vec2 (dx*i, dy*i) * dir) * fac;
                         }
                         float radius = 0.5;
-                        /*
-                        //float point_dist = sqrt(sqr(0.5-gl_TexCoord[0].s)+sqr(0.5-gl_TexCoord[0].t));
-                        //float point_dist = sqrt(2.0*2.0+2.0*2.0);
-                        if (gl_TexCoord[0].s < 0.495) {
+                        
+                        float point_dist = sqrt((0.5-gl_TexCoord[0].s)*(0.5-gl_TexCoord[0].s)+(0.5-gl_TexCoord[0].t)*(0.5-gl_TexCoord[0].t));
+                        
+                        if (point_dist  < 0.5) {
                             gl_FragColor =  color / weight;
-                        }
-                        else if( gl_TexCoord[0].s>0.505 )
-                        {
-                            gl_FragColor =  orgcolor;
-                        }
+                        }                        
                         else
                         {
-                            gl_FragColor =  vec4(1,0,0,1);
-                        }*/
-                        
-                        gl_FragColor =  color / weight;
+                            gl_FragColor =  vec4(0,0,0,0.0);//vec4(1,0,0,0.0);
+                        }
                     }
             """
         
@@ -433,8 +428,9 @@ class Filter:
             self.current_texture = texture
             self.fbo = Fbo(size=texture_size, with_depthbuffer=False)
             
+        first_pass_fbo = Fbo(size=texture_size, with_depthbuffer=False)
         #horizontal pass
-        with self.fbo:
+        with first_pass_fbo:
             self.shader.use()
             #self.shader['value'] = value
             self.shader['size_x'] = float(texture_size[0])
@@ -456,7 +452,7 @@ class Filter:
             self.shader['direction'] = 1.0
             self.shader['value'] = value
             set_color(1, 1, 1)
-            drawTexturedRectangle(self.fbo.texture, size=self.fbo.size)
+            drawTexturedRectangle(first_pass_fbo.texture, size=self.fbo.size)
             self.shader.stop()
             
         return self.fbo.texture

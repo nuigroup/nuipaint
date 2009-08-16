@@ -13,7 +13,6 @@ additional_css = '''
 '''
 css_add_sheet(additional_css)
 
-
 class FullScreenPaint(MTWidget):
     def __init__(self, **kwargs):
         super(FullScreenPaint,self).__init__(**kwargs)
@@ -30,18 +29,17 @@ class FullScreenPaint(MTWidget):
         Observer.register("layer_manager_list",self.lm)
         
         #File Browser
-        self.fb = MTFileBrowser(pos=(100,400),size=(400,380))
+        self.fb = MTFileBrowser(pos=(100,400),size=(400,380),exit_on_submit=False)
         self.add_widget(self.fb)
         self.fb.hide()
         Observer.register("file_browser",self.fb)
         
         @self.fb.event
         def on_select(list):
-            if len(list) == 0:
-                return
-            img = pyglet.image.load(list[0])
-            new_canvas = Canvas(size=(img.width,img.height),pos=(0,0),cls=('roundedBorder'),background=list[0])
-            self.add_widget(new_canvas)       
+            for item in list:
+                img = pyglet.image.load(item)
+                new_canvas = Canvas(size=(img.width,img.height),pos=(0,0),cls=('roundedBorder'),background=item)
+                self.add_widget(new_canvas)       
             
         #Bottom Toolbar
         self.tb = toolbar()
@@ -141,9 +139,11 @@ def init_nuipaint(w, *largs):
     clipboard = Clipboard()
     Observer.register('clipboard',clipboard)
     
-    fb = MTFileBrowser(pos=(100,100),size=(400,380))
+    fb = MTFileBrowser(pos=(100,100),size=(400,380),exit_on_submit=False)
     w.add_widget(fb)
-    fb.hide()
+    Observer.register('desktop_file_browser',fb)
+    Observer.get('desktop_file_browser').hide()
+    
     
     new_button = MTIconButton(pos=(10,10),icon_file="gfx/icons/new_L.png",label="New")
     w.add_widget(new_button)
@@ -174,16 +174,14 @@ def init_nuipaint(w, *largs):
     
     @open_button.event
     def on_press(touch):
-        fb.show()            
-
+        fb.show()
         
     @fb.event
     def on_select(list):
-        if len(list) == 0:
-            return
-        img = pyglet.image.load(list[0])
-        open_window = NUIPaint(file=list[0],window = w,pos=(200,200),size=(img.width,img.height),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.3,0.3,0.3),'bg-color-full':(0.3,0.3,0.3),'border-width':20})
-        w.add_widget(open_window)
+        for item in list:
+            img = pyglet.image.load(item)
+            open_window = NUIPaint(file=item,window = w,pos=(200,200),size=(img.width,img.height),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.3,0.3,0.3),'bg-color-full':(0.3,0.3,0.3),'border-width':20})
+            w.add_widget(open_window)
     
 if __name__ == '__main__':
     w = MTWindow()

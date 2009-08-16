@@ -116,6 +116,11 @@ class Canvas(MTScatterWidget):
             set_color(1, 1, 1, .99) 
             self.layer_manager.background.dispatch_event('on_draw')
         return self.fbo.texture
+        
+    def reset_fbo(self):
+        with self.layer_manager.background.fbo:
+            set_color(1, 1, 1, .99) 
+            drawRectangle(pos=(0,0),size=self.size)
     
     def on_touch_down(self,touch):
         if self.collide_point(touch.x,touch.y):

@@ -77,19 +77,19 @@ class AbstractLayer(MTScatterWidget):
         
     def settemptex(self, origin, location=(0,0)):
         x,y = map(int,origin)
-        return self.fbo.texture.get_region(x - 16, y - 16, 3, 32)
+        return self.fbo.texture.get_region(x - 16, y - 16, 32, 32)
         
     def set_brush_fbo(self, origin, location=(0,0)):
         x,y = map(int,origin)
-        self.smudge_region = self.fbo.texture.get_region(x - 8, y - 8, 16, 16)
+        self.smudge_region = self.fbo.texture.get_region(x - 16, y - 16, 32, 32)
         with self.brush_fbo:
             drawTexturedRectangle(self.smudge_region, pos=origin, size=(32, 32))
         
     def smudge(self, origin, location=(0,0)):
         with self.brush_fbo:
-            alt = self.filter.circularblur(self.smudge_region,(16,16),0.5)        
+            alt = self.filter.circularblur(self.smudge_region,(32,32),0.5)        
         with self.fbo:
-            drawTexturedRectangle(alt, pos=origin, size=(16, 16))
+            drawTexturedRectangle(alt, pos=origin, size=(32, 32))
             
 
 class NormalLayer(AbstractLayer):

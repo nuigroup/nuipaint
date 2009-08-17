@@ -456,3 +456,46 @@ class Filter:
             self.shader.stop()
             
         return self.fbo.texture
+        
+    def eraser(self,texture,texture_size,value):
+        erasev_shader_src = """
+            void main(void)
+                {
+                 gl_TexCoord[0] = gl_MultiTexCoord0;
+                 gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; 
+                }
+            """
+
+        erasef_shader_src = """
+                    uniform sampler2D   tex;
+                    void main (void) {
+                        vec4 orgcolor = texture2D(tex, gl_TexCoord[0].st);
+    
+                        float point_dist = sqrt((0.5-gl_TexCoord[0].s)*(0.5-gl_TexCoord[0].s)+(0.5-gl_TexCoord[0].t)*(0.5-gl_TexCoord[0].t));
+                        
+                        if (point_dist  < 0.5) {
+                            gl_FragColor =  vec4(0,1,0,1.0);
+                        }                        
+                        else
+                        {
+                            gl_FragColor =  vec4(1,0,0,1.0);
+                        }
+                    }
+            """
+        
+        if self.current_shader != 9 :
+            self.shader = Shader(vertex_source=erasev_shader_src, fragment_source=erasef_shader_src)
+            self.current_shader = 9
+            
+        if self.current_texture != texture :    
+            self.current_texture = texture
+            self.fbo = Fbo(size=texture_size, with_depthbuffer=False)
+
+        #horizontal pass
+        with self.fbo:
+            self.shader.use()
+            set_color(1, 1, 1)
+            drawTexturedRectangle(self.current_texture, size=self.fbo.size)
+            self.shader.stop()
+
+        return self.fbo.texture

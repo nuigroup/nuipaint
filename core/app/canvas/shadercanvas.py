@@ -90,6 +90,7 @@ class Canvas(MTScatterWidget):
         region = self.fbo.texture.get_region(x - 16, y - 16, 32, 32)
         with self.fbo:
             self.smudge_shader.use()
+            glColor4f(1,1,1,1)
             drawTexturedRectangle(region, pos=origin, size=(32, 32))
             self.smudge_shader.stop()
             

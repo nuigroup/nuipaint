@@ -38,15 +38,19 @@ class topBar(MTWidget):
         def on_press(touch):
             self.filebrowser.show()
         
+        @save_icon.event
+        def on_press(touch):
+            Observer.get('canvas').save_image()
+        
         @fullscreen_icon.event
         def on_press(touch):
             self.handler.unfullscreen()
             
         @cut_icon.event
         def on_press(touch):            
-            tex = self.canvas.get_fbo_texture()           
+            tex = Observer.get('canvas').get_fbo_texture()           
             if self.clipboard.set_data(tex):
-                self.canvas.reset_fbo()
+                Observer.get('canvas').reset_fbo()
             
         @copy_icon.event
         def on_press(touch):

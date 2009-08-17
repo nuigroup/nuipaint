@@ -22,7 +22,7 @@ class MTBrushResizer(MTWidget):
         self.brush_image = MTScatterImage(filename=brush_image,do_translation=False,do_rotation=False,scale_min=0.1)
         self.current_brush = brush_image
         self.bound.add_widget(self.brush_image)
-        self.canvas.set_brush(sprite=brush_image,size=brush_size)
+        Observer.get('canvas').set_brush(sprite=brush_image,size=brush_size)
         
     def on_touch_down(self,touch):
         if self.collide_point(touch.x,touch.y):
@@ -32,5 +32,5 @@ class MTBrushResizer(MTWidget):
                 self.current_brush_size = 200
             elif self.current_brush_size < 10:
                 self.current_brush_size = 10
-            self.canvas.set_brush(sprite=self.current_brush,size=self.current_brush_size)
+            Observer.get('canvas').set_brush(sprite=self.current_brush,size=self.current_brush_size)
             super(MTBrushResizer, self).on_touch_down(touch)

@@ -92,21 +92,17 @@ class Canvas(MTScatterWidget):
             texture = ptexture
             z = 0
 
-        print texture.target, texture.id
-        print texture.images, texture.width, texture.height
         glBindTexture(texture.target, texture.id)
         glPushClientAttrib(GL_CLIENT_PIXEL_STORE_BIT)
         glPixelStorei(GL_PACK_ALIGNMENT, 1)
         buffer = \
             (GLubyte * (texture.width * texture.height * texture.images * len(format)))()
-        print buffer
+
         glGetTexImage(texture.target, texture.level, 
                       gl_format, GL_UNSIGNED_BYTE, buffer)
         glPopClientAttrib()
-        print 'buffer', buffer
 
         data = ImageData(texture.width, texture.height, format, buffer)
-        print data
         if texture.images > 1:
             data = data.get_region(0, z * texture.height, texture.width, texture.height)
         if ptexture != texture:
@@ -188,18 +184,14 @@ class Canvas(MTScatterWidget):
         if self.collide_point(touch.x,touch.y):
             Observer.register('canvas',self)
             Observer.register('layer_manager',self.layer_manager)
-            self.reset_all_canvas_deps()
             Observer.get("layer_manager_list").set_new_list(self.layer_manager)
             self.current_view = self.current_canvas_view()
             Observer.register('last_saved_background_view',self.current_view)
             super(Canvas, self).on_touch_down(touch)
             
-    def reset_all_canvas_deps(self):        
-        Observer.get("bottom_toolbar").canvas = self
-        Observer.get("top_toolbar").canvas = self
-        Observer.get("brush_resizer").canvas = self
-        Observer.get("circular_menu").canvas = self
-        Observer.get("color_selector").canvas = self
+    """def on_touch_move(self, touch):
+        if touch.id in self.touches and touch.grab_current == self:
+            super(Canvas, self).on_touch_down(touch)"""
         
     def hide_work_area(self):
         self.work_area_hidden = True

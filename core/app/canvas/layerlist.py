@@ -116,6 +116,8 @@ class LayerManagerList(MTRectangularWidget):
         self.add_widget(merge)
         @merge.event    
         def on_press(touch):
+            if len(self.layer_manager.layer_list) == 0:
+                return
             if len(self.selected_layers) == 0:
                 #create the merged layers
                 canvas = Observer.get('canvas')
@@ -127,7 +129,7 @@ class LayerManagerList(MTRectangularWidget):
                 self.layer_manager.delete_layer(self.selected_layers)
                 #clear background layers fbo and paste merged layer
                 self.layer_manager.background.layer_clear()
-                self.layer_manager.background.fbo.texture = merge_fbo.texture
+                self.layer_manager.background.set_new_fbo_image(merge_fbo.texture)
                 #reset all list and update the layerlist
                 self.layer_manager.layer_list = []
                 self.selected_layers = []

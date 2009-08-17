@@ -35,26 +35,28 @@ class toolbar(MTWidget):
         tb = toolbarHolder(size=(430,70))
         tb.pos = (int(self.parent_win.width/2-tb.width/2),-5)
         brush_icon = MTImageButton(filename='gfx/icons/brush white txt.png')
-        select_icon = MTImageButton(filename='gfx/icons/select white txt.png')
+        #select_icon = MTImageButton(filename='gfx/icons/select white txt.png')
         zoom_icon = MTImageButton(filename='gfx/icons/zoom white txt.png')
         filter_icon = MTImageButton(filename='gfx/icons/filter white txt.png')
-        polygon_icon = MTImageButton(filename='gfx/icons/polygon white txt.png')
-        flickr_icon = MTImageButton(filename='gfx/icons/flickr white txt.png')
+        smudge_icon = MTImageButton(filename='gfx/icons/smudge.png')
+        #flickr_icon = MTImageButton(filename='gfx/icons/flickr white txt.png')
+        eraser_icon = MTImageButton(filename='gfx/icons/eraser.png')
         tb.add_widget(brush_icon)
-        tb.add_widget(select_icon)
+        #tb.add_widget(select_icon)
         tb.add_widget(zoom_icon)
         tb.add_widget(filter_icon)
-        tb.add_widget(polygon_icon)
-        tb.add_widget(flickr_icon)
+        tb.add_widget(smudge_icon)
+        tb.add_widget(eraser_icon)
+        #tb.add_widget(flickr_icon)
         self.add_widget(tb)
         
         @zoom_icon.event
         def on_press(touch):
-            self.canvas.set_mode("zoom")
+            Observer.get('canvas').set_mode("zoom")
             
         @brush_icon.event
         def on_press(touch):
-            self.canvas.set_mode("draw")
+            Observer.get('canvas').set_mode("draw")
             
         @filter_icon.event
         def on_press(touch):
@@ -65,6 +67,15 @@ class toolbar(MTWidget):
         def on_release(touch):
             filterbox = Observer.get('filter_box')
             filterbox.hide()
+            
+        @eraser_icon.event
+        def on_press(touch):
+            Observer.get('canvas').set_mode("erase")
+
+        @smudge_icon.event
+        def on_press(touch):
+            Observer.get('canvas').set_mode("smudge")
+        
         
         
             

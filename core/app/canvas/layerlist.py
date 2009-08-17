@@ -86,6 +86,25 @@ class LayerManagerList(MTRectangularWidget):
                 entry = layerEntry(id=layer.id,layer_text="Layer "+str(layer.id),layer_ptr=layer,layer_list=self)
                 self.list_layout.add_widget(entry)
                 self.list_items.append(entry)
+                
+        self.create_pop_up  = MTPopup(label_submit="Create Layer", title="New Layer",size=(400, 350),pos=(400,300))
+        xml = XMLWidget(xml='''<?xml version="1.0"?>
+        <MTGridLayout cols="2" rows="2" spacing="2" padding="2">
+            <MTLabel label="'Width'" autoheight="True"/>
+            <MTTextInput id="'input_width'" label="'500'" height="30"/>
+            <MTLabel label="'Height'" autoheight="True"/>
+            <MTTextInput id="'input_height'" label="'400'" height="30"/>
+        </MTGridLayout>
+        ''')
+        self.create_pop_up.add_widget(xml.children[0], True)
+        self.create_width_txt = getWidgetById('input_width')
+        self.create_height_txt = getWidgetById('input_height')
+
+        self.add_widget(self.create_pop_up)
+        self.create_pop_up.hide()
+        @self.create_pop_up.event
+        def on_submit(*largs):
+            print "create layer",(int(self.create_width_txt.get_label()),int(self.create_height_txt.get_label()))
         
         
         create = MTButton(label="New",pos=(self.pos[0]+10,self.pos[1]+10),size=(50,30),cls=('simple', 'colored'))
@@ -93,12 +112,13 @@ class LayerManagerList(MTRectangularWidget):
         
         @create.event    
         def on_press(touch):
-            if self.list_layout.pchildren[0].label == 'No Layers':
+            self.create_pop_up.show()
+            """if self.list_layout.pchildren[0].label == 'No Layers':
                 for item in self.list_items:
                     self.list_layout.remove_widget(item)
                     self.list_items.remove(item)
             self.layer_manager.create_layer(pos=(0,0),size=(200,200))
-            self.updateLayerList()
+            self.updateLayerList()"""
         
         delete = MTButton(label="Delete",pos=(self.pos[0]+70,self.pos[1]+10),size=(55,30),cls=('simple', 'colored'))
         self.add_widget(delete)

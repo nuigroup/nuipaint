@@ -54,7 +54,7 @@ class topBar(MTWidget):
             
         @copy_icon.event
         def on_press(touch):
-            tex = self.canvas.get_fbo_texture()
+            tex = Observer.get('canvas').get_fbo_texture()
             self.clipboard.set_data(tex)
             
         @paste_icon.event

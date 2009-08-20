@@ -21,6 +21,37 @@ smudgev_shader_src = """
             }
 """
 
+def drawDashedLine(points, width=None):
+    '''Draw a line
+
+    :Parameters:
+        `points` : list
+            List of point to draw, len must be power of 2
+        `widget` : float, default to 5.0
+            Default width of line
+    '''
+    style = GL_LINES
+    if width is not None:
+        glPushAttrib(GL_LINE_BIT)
+        glLineWidth(width)        
+
+    points = list(points)
+    l = len(points)
+    if l < 4:
+        return
+    if l > 4:
+        style = GL_LINE_STRIP
+    
+    glEnable(GL_LINE_STIPPLE) 
+    glLineStipple(3, 0xAAAA)
+    with gx_begin(style):        
+        while len(points):
+            glVertex2f(points.pop(0), points.pop(0))
+
+    if width is not None:
+        glPopAttrib()
+
+
 smudgef_shader_src = """
                     uniform sampler2D   tex;
                     uniform float direction;
@@ -99,8 +130,9 @@ class AbstractLayer(MTScatterWidget):
         self.smudge_region = None
         self.erase_region = None
         self.ox,self.oy = 0,0
-        
-        self.order_done = True
+        box = pyglet.image.load(os.path.join('gfx','icons','small_box.jpg'))
+        self.box = box.get_texture()
+        self.highlight =  False
         
     def layer_clear(self):
         with self.fbo:
@@ -108,19 +140,14 @@ class AbstractLayer(MTScatterWidget):
             glClear(GL_COLOR_BUFFER_BIT)
 
     def on_touch_down(self, touch):
-        if self.collide_point(touch.x,touch.y): 
+        if self.collide_point(touch.x,touch.y):
             touches = getAvailableTouchs()
+            print "touched"
             if len(touches)==2 :               
                 if touch.is_double_tap:
-                    if self.order_done:
-                        self.layer_manager.move_layer_down(self.id)
-                        self.order_done = False
-                        clock.schedule_once(self.reset_order_done, 0.25)
+                    self.layer_manager.move_layer_down(self.id)
             elif touch.is_double_tap:
-                if self.order_done:
-                    self.layer_manager.move_layer_up(self.id)
-                    self.order_done = False
-                    clock.schedule_once(self.reset_order_done, 0.25)
+                self.layer_manager.move_layer_up(self.id)
             elif self.layer_manager.mode == "draw":
                 self.ox,self.oy = touch.x,touch.y
                 with self.fbo:
@@ -140,7 +167,7 @@ class AbstractLayer(MTScatterWidget):
             return True
             
     def on_touch_move(self, touch):
-        if touch.id in self.touches and touch.grab_current == self: 
+        if touch.id in self.touches and touch.grab_current == self:
             if self.layer_manager.mode == "zoom":
                 super(AbstractLayer, self).on_touch_move(touch)
             elif self.layer_manager.mode == "draw":
@@ -159,9 +186,6 @@ class AbstractLayer(MTScatterWidget):
                 self.set_brush_fbo(self.to_local(touch.x,touch.y))
                 self.smudge(self.to_local(touch.x,touch.y))
             return True
-            
-    def reset_order_done(self,dt):
-        self.order_done = True
 
     def getLayerManager(self):
         return self.layer_manager
@@ -210,6 +234,7 @@ class AbstractLayer(MTScatterWidget):
 class NormalLayer(AbstractLayer):
     def __init__(self, **kwargs):
         kwargs.setdefault('layer_manager', None)
+        kwargs.setdefault('moveable', True)
         self.moveable = kwargs.get('moveable')
         if self.moveable == False :
             kwargs.setdefault('do_scale', False)
@@ -231,13 +256,16 @@ class NormalLayer(AbstractLayer):
         
     def draw(self):
         drawTexturedRectangle(texture=self.fbo.texture, size=self.size)
-        if self.moveable and self.highlight:
-            set_color(0,0,1,0.5)
-            drawRectangle(size=self.size)
+        if self.moveable and self.highlight:            
+            drawTexturedRectangle(texture=self.box,size=(self.box.width,self.box.height),pos=(-5,-5))
+            drawTexturedRectangle(texture=self.box,size=(self.box.width,self.box.height),pos=(self.width-5,-5))
+            drawTexturedRectangle(texture=self.box,size=(self.box.width,self.box.height),pos=(self.width-5,self.height-5))
+            drawTexturedRectangle(texture=self.box,size=(self.box.width,self.box.height),pos=(-5,self.height-5))            
 
 class ImageLayer(AbstractLayer):
     def __init__(self, **kwargs):
         kwargs.setdefault('layer_manager', None)
+        kwargs.setdefault('moveable', True)
         self.moveable = kwargs.get('moveable')
         if self.moveable == False :
             kwargs.setdefault('do_scale', False)
@@ -265,5 +293,8 @@ class ImageLayer(AbstractLayer):
     def draw(self):
         drawTexturedRectangle(texture=self.fbo.texture, size=self.size)
         if self.moveable and self.highlight:
-            set_color(0,0,1,0.5)
-            drawRectangle(size=self.size)
+            drawTexturedRectangle(texture=self.box,size=(self.box.width,self.box.height),pos=(-5,-5))
+            drawTexturedRectangle(texture=self.box,size=(self.box.width,self.box.height),pos=(self.width-5,-5))
+            drawTexturedRectangle(texture=self.box,size=(self.box.width,self.box.height),pos=(self.width-5,self.height-5))
+            drawTexturedRectangle(texture=self.box,size=(self.box.width,self.box.height),pos=(-5,self.height-5))
+            

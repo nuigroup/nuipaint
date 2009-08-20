@@ -69,6 +69,14 @@ class Canvas(MTScatterWidget):
         self.prev_pos = self.pos
         self.current_view = self.current_canvas_view()
         Observer.register('last_saved_background_view',self.current_view)
+        
+        @self.event
+        def on_move(*largs):
+            Observer.register('canvas',self)
+            Observer.register('layer_manager',self.layer_manager)
+            Observer.get("layer_manager_list").set_new_list(self.layer_manager)
+            self.current_view = self.current_canvas_view()
+            Observer.register('last_saved_background_view',self.current_view)
 		
     def draw(self):
         with gx_matrix:
@@ -180,14 +188,9 @@ class Canvas(MTScatterWidget):
             set_color(1, 1, 1, .99) 
             drawRectangle(pos=(0,0),size=self.size)
     
-    def on_touch_down(self,touch):
+    """def on_touch_down(self,touch):
         if self.collide_point(touch.x,touch.y):
-            Observer.register('canvas',self)
-            Observer.register('layer_manager',self.layer_manager)
-            Observer.get("layer_manager_list").set_new_list(self.layer_manager)
-            self.current_view = self.current_canvas_view()
-            Observer.register('last_saved_background_view',self.current_view)
-            super(Canvas, self).on_touch_down(touch)
+            """
             
     """def on_touch_move(self, touch):
         if touch.id in self.touches and touch.grab_current == self:

@@ -32,11 +32,11 @@ class layerItem(MTButton):
             if self.layer.highlight == False :
                 self.layer.highlight = True
                 self.color = (1.0,0.4,0)
-                self.layer_list.selected_layers.append(self.id)
+                self.layer_list.selected_layers.append(self.layer.id)
             else:
                 self.layer.highlight = False 
                 self.color = self.style['bg-color']
-                self.layer_list.selected_layers.remove(self.id)
+                self.layer_list.selected_layers.remove(self.layer.id)
         return True
        
 class layerEntry(layerItem, MTKineticObject):
@@ -104,6 +104,7 @@ class LayerManagerList(MTRectangularWidget):
         self.create_pop_up.hide()
         @self.create_pop_up.event
         def on_submit(*largs):
+            print "called create"
             width = int(self.create_width_txt.get_label())
             height = int(self.create_height_txt.get_label())
             if self.list_layout.pchildren[0].label == 'No Layers':
@@ -198,7 +199,7 @@ class LayerManagerList(MTRectangularWidget):
             
         self.list_items = []
         
-        self.layer_list = self.layer_manager.getLayerList()
+        self.layer_list = Observer.get('layer_manager').getLayerList()
         
         for layer in self.layer_list:
             if layer.id in self.selected_layers:
@@ -215,6 +216,8 @@ class LayerManagerList(MTRectangularWidget):
             return
             
     def set_new_list(self,layer_manager):
+        if Observer.get('layer_manager') == self.layer_manager: #return if layermanagerlist is same as self
+            return
         for item in self.list_items:
             self.list_layout.remove_widget(item)
             

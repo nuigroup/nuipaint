@@ -3,6 +3,7 @@ from pymt import *
 from pyglet.gl import *
 from filters import *
 from core.app.observer import *
+from pyglet import clock
 
 def customPaintLine(*largs, **kwargs):
     glBlendEquationSeparate(GL_FUNC_ADD, GL_MAX)
@@ -79,7 +80,8 @@ void main()
 class AbstractLayer(MTScatterWidget):
     def __init__(self, **kwargs):
         kwargs.setdefault('layer_manager', None)
-        self.layer_manager = kwargs.get('layer_manager')        
+        self.layer_manager = kwargs.get('layer_manager')
+        kwargs.setdefault('auto_bring_to_front', False)        
         super(AbstractLayer, self).__init__(**kwargs)
         self.fbo = Fbo(size=(self.width, self.height), with_depthbuffer=False)                
         self.color = (1,1,1,1)
@@ -98,6 +100,8 @@ class AbstractLayer(MTScatterWidget):
         self.erase_region = None
         self.ox,self.oy = 0,0
         
+        self.order_done = True
+        
     def layer_clear(self):
         with self.fbo:
             glClearColor(0, 0, 0, 0)
@@ -106,12 +110,18 @@ class AbstractLayer(MTScatterWidget):
     def on_touch_down(self, touch):
         if self.collide_point(touch.x,touch.y): 
             touches = getAvailableTouchs()
-            if len(touches)==2 :                
+            if len(touches)==2 :               
                 if touch.is_double_tap:
-                    self.layer_manager.move_layer_down(self.id)
+                    if self.order_done:
+                        self.layer_manager.move_layer_down(self.id)
+                        self.order_done = False
+                        clock.schedule_once(self.reset_order_done, 0.25)
             elif touch.is_double_tap:
-               self.layer_manager.move_layer_up(self.id)
-            if self.layer_manager.mode == "draw":
+                if self.order_done:
+                    self.layer_manager.move_layer_up(self.id)
+                    self.order_done = False
+                    clock.schedule_once(self.reset_order_done, 0.25)
+            elif self.layer_manager.mode == "draw":
                 self.ox,self.oy = touch.x,touch.y
                 with self.fbo:
                     set_color(*self.layer_manager.brush_color)
@@ -149,6 +159,9 @@ class AbstractLayer(MTScatterWidget):
                 self.set_brush_fbo(self.to_local(touch.x,touch.y))
                 self.smudge(self.to_local(touch.x,touch.y))
             return True
+            
+    def reset_order_done(self,dt):
+        self.order_done = True
 
     def getLayerManager(self):
         return self.layer_manager

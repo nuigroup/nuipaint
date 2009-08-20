@@ -87,24 +87,31 @@ class LayerManagerList(MTRectangularWidget):
                 self.list_layout.add_widget(entry)
                 self.list_items.append(entry)
                 
-        self.create_pop_up  = MTPopup(label_submit="Create Layer", title="New Layer",size=(400, 350),pos=(400,300))
+        self.create_pop_up  = MTPopup(label_submit="Create Layer", title="New Layer",size=(400, 350),pos=(self.pos[0]-230,self.pos[1]),exit_on_submit=False)
         xml = XMLWidget(xml='''<?xml version="1.0"?>
         <MTGridLayout cols="2" rows="2" spacing="2" padding="2">
             <MTLabel label="'Width'" autoheight="True"/>
-            <MTTextInput id="'input_width'" label="'500'" height="30"/>
+            <MTTextInput id="'input_width'" label="'200'" height="30"/>
             <MTLabel label="'Height'" autoheight="True"/>
-            <MTTextInput id="'input_height'" label="'400'" height="30"/>
+            <MTTextInput id="'input_height'" label="'200'" height="30"/>
         </MTGridLayout>
         ''')
         self.create_pop_up.add_widget(xml.children[0], True)
         self.create_width_txt = getWidgetById('input_width')
         self.create_height_txt = getWidgetById('input_height')
 
-        self.add_widget(self.create_pop_up)
+        Observer.get('inner_window_handler').add_widget(self.create_pop_up)
         self.create_pop_up.hide()
         @self.create_pop_up.event
         def on_submit(*largs):
-            print "create layer",(int(self.create_width_txt.get_label()),int(self.create_height_txt.get_label()))
+            width = int(self.create_width_txt.get_label())
+            height = int(self.create_height_txt.get_label())
+            if self.list_layout.pchildren[0].label == 'No Layers':
+                for item in self.list_items:
+                    self.list_layout.remove_widget(item)
+                    self.list_items.remove(item)
+            self.layer_manager.create_layer(pos=(0,0),size=(width,height))
+            self.updateLayerList()
         
         
         create = MTButton(label="New",pos=(self.pos[0]+10,self.pos[1]+10),size=(50,30),cls=('simple', 'colored'))
@@ -112,19 +119,18 @@ class LayerManagerList(MTRectangularWidget):
         
         @create.event    
         def on_press(touch):
-            #self.create_pop_up.show()
-            if self.list_layout.pchildren[0].label == 'No Layers':
-                for item in self.list_items:
-                    self.list_layout.remove_widget(item)
-                    self.list_items.remove(item)
-            self.layer_manager.create_layer(pos=(0,0),size=(200,200))
-            self.updateLayerList()
+            self.create_pop_up.show()
+            self.create_pop_up.bring_to_front()
         
         delete = MTButton(label="Delete",pos=(self.pos[0]+70,self.pos[1]+10),size=(55,30),cls=('simple', 'colored'))
         self.add_widget(delete)
         
-        @delete.event    
-        def on_press(touch):
+        self.delete_pop_up  = MTPopup(label_submit="Delete Layers", title="Delete Layers",size=(215,80),pos=(self.pos[0]-230,self.pos[1]),exit_on_submit=False)
+        Observer.get('inner_window_handler').add_widget(self.delete_pop_up)
+        self.delete_pop_up.hide()
+        
+        @self.delete_pop_up.event
+        def on_submit(*largs):
             self.layer_manager.delete_layer(self.selected_layers)
             self.updateLayerList()
             if len(self.list_layout.pchildren) == 0 :
@@ -132,10 +138,20 @@ class LayerManagerList(MTRectangularWidget):
                 self.list_layout.add_widget(entry)
                 self.list_items.append(entry)
         
+        @delete.event    
+        def on_press(touch):
+            if len(self.selected_layers)>0:
+                self.delete_pop_up.show()
+        
         merge = MTButton(label="Merge",pos=(self.pos[0]+135,self.pos[1]+10),size=(55,30),cls=('simple', 'colored'))
         self.add_widget(merge)
-        @merge.event    
-        def on_press(touch):
+        
+        self.merge_pop_up  = MTPopup(label_submit="Merge Layers", title="Merge Layers",size=(215,80),pos=(self.pos[0]-230,self.pos[1]),exit_on_submit=False)
+        Observer.get('inner_window_handler').add_widget(self.merge_pop_up)
+        self.merge_pop_up.hide()
+        
+        @self.merge_pop_up.event
+        def on_submit(*largs):
             if len(self.layer_manager.layer_list) == 0:
                 return
             if len(self.selected_layers) == 0:
@@ -167,6 +183,14 @@ class LayerManagerList(MTRectangularWidget):
                 self.layer_manager.delete_layer(self.selected_layers)
                 self.selected_layers = []
                 self.paste_layer(merge_fbo.texture)
+                
+        @merge.event    
+        def on_press(touch):
+            if len(self.selected_layers) == 0:
+                self.merge_pop_up.w_title.set_label('Merge All Layers ?')
+            else:
+                self.merge_pop_up.w_title.set_label('Merge Selected Layers ?')
+            self.merge_pop_up.show()
         
     def updateLayerList(self):
         for item in self.list_items:

@@ -112,13 +112,13 @@ class LayerManagerList(MTRectangularWidget):
         
         @create.event    
         def on_press(touch):
-            self.create_pop_up.show()
-            """if self.list_layout.pchildren[0].label == 'No Layers':
+            #self.create_pop_up.show()
+            if self.list_layout.pchildren[0].label == 'No Layers':
                 for item in self.list_items:
                     self.list_layout.remove_widget(item)
                     self.list_items.remove(item)
             self.layer_manager.create_layer(pos=(0,0),size=(200,200))
-            self.updateLayerList()"""
+            self.updateLayerList()
         
         delete = MTButton(label="Delete",pos=(self.pos[0]+70,self.pos[1]+10),size=(55,30),cls=('simple', 'colored'))
         self.add_widget(delete)

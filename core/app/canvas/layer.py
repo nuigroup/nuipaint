@@ -51,7 +51,7 @@ smudgef_shader_src = """
                         if (point_dist  > 0.5) {
                             discard;
                         }                        
-                        gl_FragColor =  color / weight;
+                        gl_FragColor =  orgcolor;//color / weight;
                     }
 """
        

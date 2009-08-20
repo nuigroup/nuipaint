@@ -47,16 +47,16 @@ class FullScreenPaint(MTWidget):
             
         #Top Toolbar
         self.topb = topBar()
-        self.add_widget(self.topb)
+        self.add_widget(self.topb)        
         
-        
-        #Brush Resizer
-        self.br = MTBrushResizer(size=(100,100))
-        self.add_widget(self.br)
-        
+                
         #Side Ciruclar Menu
         self.cm = MTCircularMenu(pos=(-225,-225),radius=225)
         self.add_widget(self.cm)
+        
+        #Brush Resizer
+        self.br = MTBrushResizer(size=(100,100),pos=(0,0))
+        self.add_widget(self.br)
         
         #Intialize Circular menu with brushes
         brush_list = []
@@ -64,8 +64,7 @@ class FullScreenPaint(MTWidget):
         for brush in glob('brushes/*.png'):
             brush_list.append([brush,self.br.set_brush,brush])
             
-        self.cm.set_list(list=brush_list)        
-        
+        self.cm.set_list(list=brush_list)  
         
         self.filterbox = FilterBox(pos = (self.w.width/2-30,75))
         self.add_widget(self.filterbox)

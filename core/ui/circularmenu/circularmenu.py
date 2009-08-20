@@ -47,49 +47,48 @@ class MTCircularItem(MTButton):
         self.size           = (self.image.width, self.image.height)
         self.image.draw()
 
-class MTCircularMenu(MTWidget):
-    def __init__(self, **kwargs):
-        super(MTCircularMenu, self).__init__(**kwargs)
-        self.canvas = Observer.get('canvas')
-        self.pos = kwargs.get('pos')
-        self.radius = kwargs.get('radius')
-       
-        kt = MTKinetic(velstop=5.0)
-        self.circular_menu_render = MTCircularMenu_Render(pos=self.pos,radius=self.radius)
-        kt.add_widget(self.circular_menu_render)
-        self.add_widget(kt)        
-        
-    def set_list(self,list):
-        for item in list:
-            im = MTCircularItem(filename=item[0],handler=item[1],value=item[2])
-            self.circular_menu_render.add_widget(im)
-
-class MTCircularMenu_Render(MTScatterWidget):
+class MTCircularMenu(MTScatterWidget):
     def __init__(self, **kwargs):
         kwargs.setdefault('do_scale', False)
         kwargs.setdefault('do_rotation', True)
         kwargs.setdefault('do_translation', False)
-        super(MTCircularMenu_Render, self).__init__(**kwargs)
+        kwargs.setdefault('auto_bring_to_front', False)
+        super(MTCircularMenu, self).__init__(**kwargs)
+        self.canvas = Observer.get('canvas')
         self.radius = kwargs.get('radius')
         self.size = (self.radius*2,self.radius*2)
-        self.pos = kwargs.get('pos')
-        #super(MTCircularMenu_Render, self).init_transform(self.pos, 0, 1)
+        self.pos = kwargs.get('pos')       
         
+    def set_list(self,list):
+        for item in list:
+            im = MTCircularItem(filename=item[0],handler=item[1],value=item[2])
+            self.add_widget(im)
+            
     def collide_point(self, x, y):
         return Vector(self.pos).distance((x, y)) <= self.radius
-        
+    
+    def on_touch_down(self, touch):
+        if self.collide_point(touch.x,touch.y):
+            touch.grab(self)
+            super(MTCircularMenu, self).on_touch_down(touch)
+    
+    def on_touch_move(self, touch):
+        if self.collide_point(touch.x,touch.y) and touch.grab_current == self:
+            super(MTCircularMenu, self).on_touch_move(touch)
+            
+    
     def add_widget(self, widget, do_layout=True):
-        super(MTCircularMenu_Render, self).add_widget(widget)
+        super(MTCircularMenu, self).add_widget(widget)
         self.need_layout = True
         if do_layout:
             self.do_layout()
-            
+    
     def do_layout(self):
         x = int((self.radius-40)*cos(radians(20*(len(self.children)-1))))
         y = int((self.radius-40)*sin(radians(20*(len(self.children)-1))))
         self.children[len(self.children)-1].x = x+self.radius
         self.children[len(self.children)-1].y = y+self.radius
-                
+    
     def rotate_zoom_move(self, touchid, x, y):
         # we definitly have one point
         p1_start = Vector(*self.touches[touchid])

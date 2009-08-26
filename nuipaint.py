@@ -36,7 +36,10 @@ class FullScreenPaint(MTWidget):
         
         @self.fb.event
         def on_select(list):
+            file_type_list = ['jpg','jpeg','png','bmp']
             for item in list:
+                if item.split('.')[-1] not in file_type_list:
+                    return
                 img = pyglet.image.load(item)
                 new_canvas = Canvas(size=(img.width,img.height),pos=(0,0),cls=('roundedBorder'),background=item)
                 self.add_widget(new_canvas)       
@@ -185,7 +188,10 @@ def init_nuipaint(w, *largs):
         
     @fb.event
     def on_select(list):
+        file_type_list = ['jpg','jpeg','png','bmp']
         for item in list:
+            if item.split('.')[-1] not in file_type_list:
+                return
             img = pyglet.image.load(item)
             open_window = NUIPaint(file=item,window = w,pos=(200,200),size=(img.width,img.height),style={'bg-color':(0.3,0.3,0.3,1),'bg-color-move':(0.3,0.3,0.3),'bg-color-full':(0.3,0.3,0.3),'border-width':20})
             w.add_widget(open_window)

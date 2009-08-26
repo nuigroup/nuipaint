@@ -1,0 +1,54 @@
+NUIPaint - A Multitouch Photo Manipulation and Drawing Tool
+===========================================================
+
+Website: http://code.google.com/p/nuipaint/
+
+Introduction
+------------
+
+NUIPaint is a photo editing/drawing software built to utilize multi-touch input capabilities of modern hardware.
+Its an on going project with 0.1 version being just released. 
+The 0.1 Version consists of following features
+
+    * Support for editing wide range of filetypes(Pyglet core)
+    * Support for collaborative editing (Multiple Window)
+    * Multitouch Gestures based interface
+    * Support for super fast GLSL Filters
+    * Support for Layer based editing
+    * Copy/Cut/Paste Support
+    * Wide range of brushes 
+
+There are several more features in pipeline for future version, Check out the Roadmap for 0.2 in the wiki 
+
+
+Origin
+------
+
+Digital Photo Editing and Drawing is one of those multimedia applications which require a lot of user interactions 
+to achieve a given task.This proposal is for a multi-touch based photo manipulator and drawing application that 
+would take advantage of the speedier,fewer and more intuitive inputs of a multi-touch surface thus enhancing the 
+productivity of the user.
+
+The focus is to explore new interactions & developing UI widgets for PyMT framework which would be reusable for 
+other applications. 
+
+Installation
+------------
+
+Installing NUIPaint is super easy, well its just download and run if you have The PyMT development environment 
+setup already. 
+
+    * Download & Install Python 2.6
+    * Download & Install Pyglet 1.1.2
+    * Download & Install Numpy
+    * Clone the latest PyMT trunk and run setup.py 
+
+You have now successfully setup the PyMT Dev Envirnoment. 
+Now download Nuipaint and run nuipaint.py in the root folder 
+
+
+Dependencies
+------------
+  * PyMT 0.3
+
+

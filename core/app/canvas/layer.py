@@ -12,15 +12,6 @@ def customPaintLine(*largs, **kwargs):
     paintLine(*largs, **kwargs)
     glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD)
     
-smudgev_shader_src = """
-            void main()
-
-            {
-               gl_TexCoord[0] = gl_MultiTexCoord0;
-               gl_Position = ftransform();
-            }
-"""
-
 def drawDashedLine(points, width=None):
     '''Draw a line
 
@@ -51,6 +42,15 @@ def drawDashedLine(points, width=None):
     if width is not None:
         glPopAttrib()
 
+    
+smudgev_shader_src = """
+            void main()
+
+            {
+               gl_TexCoord[0] = gl_MultiTexCoord0;
+               gl_Position = ftransform();
+            }
+"""
 
 smudgef_shader_src = """
                     uniform sampler2D   tex;
@@ -142,7 +142,6 @@ class AbstractLayer(MTScatterWidget):
     def on_touch_down(self, touch):
         if self.collide_point(touch.x,touch.y):
             touches = getAvailableTouchs()
-            print "touched"
             if len(touches)==2 :               
                 if touch.is_double_tap:
                     self.layer_manager.move_layer_down(self.id)

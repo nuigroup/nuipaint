@@ -128,14 +128,14 @@ class NUIPaint(windowing):
         self.add_widget(self.full_mode_painter)
         self.full_mode_painter.register_to_observer()
         self.canvas.enableTransformations()
-        self.canvas.init_transform((self.win.width/2-self.canvas.width/2,self.win.height/2-self.canvas.height/2), 0, 1)
+        self.canvas.init_transform(0,1,(self.win.width/2-self.canvas.width/2,self.win.height/2-self.canvas.height/2))
         self.windowed_mode_painter.wb.hide()
         self.remove_widget(self.windowed_mode_painter)
                     
     def on_unfullscreen(self):
         self.add_widget(self.windowed_mode_painter)        
         self.canvas.disableTransformations()
-        self.canvas.init_transform((-20,-20), 0, 1)
+        self.canvas.init_transform(0,1,(-20,-20))
         self.windowed_mode_painter.wb.show()
         self.windowed_mode_painter.wb.bring_to_front()
         self.remove_widget(self.full_mode_painter)

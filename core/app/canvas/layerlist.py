@@ -104,7 +104,6 @@ class LayerManagerList(MTRectangularWidget):
         self.create_pop_up.hide()
         @self.create_pop_up.event
         def on_submit(*largs):
-            print "called create"
             width = int(self.create_width_txt.get_label())
             height = int(self.create_height_txt.get_label())
             if self.list_layout.pchildren[0].label == 'No Layers':
